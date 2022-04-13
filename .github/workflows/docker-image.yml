@@ -32,4 +32,4 @@ jobs:
         context: .
         file: ./Dockerfile
         push: true
-        tags: ${{ secrets.DOCKER_HUB_USERNAME }}/formula1data:latest
+        tags: ${{ secrets.DOCKERHUB_USERNAME }}/formula1data:latest
