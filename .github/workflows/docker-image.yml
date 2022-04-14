@@ -33,6 +33,10 @@ jobs:
         key: ${{ runner.os }}-buildx-${{ github.sha }}
         restore-keys: |
             ${{ runner.os }}-buildx-
+    #Data corrente per il tag
+    - name: Get current date
+      id: date
+      run: echo "::set-output name=date::$(date +%y%m%d.%I%M%S)"
     #Costruisce l'immagine Docker e fa il push
     - name: Build and push
       uses: docker/build-push-action@v2
@@ -43,6 +47,6 @@ jobs:
         push: true
         tags: |
           ${{ secrets.DOCKERHUB_USERNAME }}/formula1data:latest
-          ${{ secrets.DOCKERHUB_USERNAME }}/formula1data:$(date +%y%m%d.%I%M%S)
+          ${{ secrets.DOCKERHUB_USERNAME }}/formula1data:${{ steps.date.outputs.date }}
         cache-from: type=local,src=/tmp/.buildx-cache
         cache-to: type=local,dest=/tmp/.buildx-cache
