@@ -1,5 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
+import { Circuito } from '../classi/circuito';
 
 @Component({
   selector: 'app-test',
@@ -10,7 +11,9 @@ export class TestComponent implements OnInit {
 
   constructor(private http: HttpClient) {
     this.loaded = 0;
-    this.mappetta = new Map<string, number>();
+    this.mappetta = new Map<number, string>();
+    this.circuitoTest = new Circuito("monza", "Autodromo Nazionale di Monza", "https://en.wikipedia.org/wiki/Monza_Circuit", 45.6156, 9.28111, "Monza", "Italy", http);
+    this.circuitoTest2 = new Circuito("bahrain", "Bahrain International Circuit", "http://en.wikipedia.org/wiki/Bahrain_International_Circuit", 26.0325, 50.5106, "Sakhir", "Bahrain", http);
   }
 
   ngOnInit(): void {
@@ -26,16 +29,17 @@ export class TestComponent implements OnInit {
       console.log(dati);
       this.vettoreDati = dati;
       console.log(this.linksImg);
+      console.log(this.mappetta);
 
-      this.downloadImages(this.allImages(this.vettoreDati.MRData.SeasonTable.Seasons));
+      //this.downloadImages(this.allImages(this.vettoreDati.MRData.SeasonTable.Seasons));
 
       //this.testImg(this.vettoreDati.MRData.SeasonTable.Seasons[0].url);
-      /*(this.vettoreDati.MRData.SeasonTable.Seasons).forEach((stagione: any) => {
-        console.log(stagione.url);
-        //this.testImg(stagione.url, stagione.season);
+      (this.vettoreDati.MRData.SeasonTable.Seasons).forEach((stagione: any) => {
+        //console.log(stagione.url);
+        this.testImg(stagione.url, stagione.season);
         //console.log(this.mappetta);
         
-      });*/
+      });
       //console.log("sussy= " + this.mappetta.get(1950));
     });
   }
@@ -71,18 +75,31 @@ export class TestComponent implements OnInit {
 
 
   //img: any;
-  mappetta: Map<string, number>;
+  mappetta: Map<number, string>;
   testImg(wikiURL: string, anno:number) {
     let tmp = wikiURL.split('/');
     wikiURL = tmp[tmp.length-1];
     console.log(wikiURL);
     this.http.get('https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&indexpageids=1&prop=pageimages&piprop=thumbnail&pithumbsize=250&titles='+wikiURL)
       .subscribe((img : any) => {
-        console.log(img);
+        console.log(img + " - " + anno);
         this.linksImg.push(img.query.pages[img.query.pageids[0]].thumbnail.source);
         //this.mappetta.set(anno, img.query.pages[img.query.pageids[0]].thumbnail.source);
-        this.mappetta.set(img.query.pages[img.query.pageids[0]].thumbnail.source, anno);
+        this.mappetta.set(anno, img.query.pages[img.query.pageids[0]].thumbnail.source);
         this.loaded++;
       })
+  }
+
+
+
+  circuitoTest: Circuito;
+  circuitoTest2: Circuito;
+  testCircuito() {
+    console.log(this.circuitoTest);
+    console.log(this.circuitoTest2);
+    this.circuitoTest.downloadStagioni(0);
+    this.circuitoTest2.downloadStagioni(0);
+    console.log(this.circuitoTest);
+    console.log(this.circuitoTest2);
   }
 }
