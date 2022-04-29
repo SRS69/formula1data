@@ -12,8 +12,8 @@ export class TestComponent implements OnInit {
   constructor(private http: HttpClient) {
     this.loaded = 0;
     this.mappetta = new Map<number, string>();
-    this.circuitoTest = new Circuito("monza", "Autodromo Nazionale di Monza", "https://en.wikipedia.org/wiki/Monza_Circuit", 45.6156, 9.28111, "Monza", "Italy", http);
-    this.circuitoTest2 = new Circuito("bahrain", "Bahrain International Circuit", "http://en.wikipedia.org/wiki/Bahrain_International_Circuit", 26.0325, 50.5106, "Sakhir", "Bahrain", http);
+    this.circuitoTest = new Circuito("monza", "Autodromo Nazionale di Monza", "https://en.wikipedia.org/wiki/Monza_Circuit", 45.6156, 9.28111, "Monza", "Italy");
+    this.circuitoTest2 = new Circuito("bahrain", "Bahrain International Circuit", "http://en.wikipedia.org/wiki/Bahrain_International_Circuit", 26.0325, 50.5106, "Sakhir", "Bahrain");
   }
 
   ngOnInit(): void {
@@ -97,8 +97,8 @@ export class TestComponent implements OnInit {
   testCircuito() {
     console.log(this.circuitoTest);
     console.log(this.circuitoTest2);
-    this.circuitoTest.downloadStagioni(0);
-    this.circuitoTest2.downloadStagioni(0);
+    //this.circuitoTest.downloadStagioni(0);
+    //this.circuitoTest2.downloadStagioni(0);
     console.log(this.circuitoTest);
     console.log(this.circuitoTest2);
   }
