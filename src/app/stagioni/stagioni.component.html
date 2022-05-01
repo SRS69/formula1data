@@ -1,0 +1,9 @@
+<button (click)="getTutteStagioni()">Tutte le stagioni di F1</button>
+<button (click)="stampa()">Stampa</button>
+<button (click)="caricaGareStagione(2022, 0)">Carica</button>
+
+<p>{{data}}</p>
+<div *ngIf="caricato()">
+    <h1 *ngFor="let stagione of sortedArray()">Stagione {{stagione.anno}}</h1>
+</div>
+

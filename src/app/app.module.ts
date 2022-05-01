@@ -4,11 +4,13 @@ import { BrowserModule } from '@angular/platform-browser';
 
 import { AppComponent } from './app.component';
 import { TestComponent } from './test/test.component';
+import { StagioniComponent } from './stagioni/stagioni.component';
 
 @NgModule({
   declarations: [
     AppComponent,
-    TestComponent
+    TestComponent,
+    StagioniComponent
   ],
   imports: [
     BrowserModule,

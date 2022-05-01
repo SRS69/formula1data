@@ -1,20 +1,22 @@
 import { ApiService } from "../servizi/api.service";
+import { Gara } from "./gara";
 import { Stagione } from "./stagione";
 
 export class Circuito {
 
-    readonly id: string;
-    readonly nome: string;
-    readonly imgUrl: string;
-    readonly latitudine: number;
-    readonly longitudine: number;
-    readonly localita: string;
-    readonly paese: string;
+    id: string;
+    nome: string;
+    imgUrl: string;
+    latitudine: number;
+    longitudine: number;
+    localita: string;
+    paese: string;
 
 
     //constructor that can accept all parameters and use setters to validate them
     constructor(id: string, nome: string, imgUrl: string, latitudine: number, longitudine: number, localita: string, paese: string) {
-        this.imgUrl = this.checkWikipediaURL(imgUrl);
+        //this.imgUrl = this.checkWikipediaURL(imgUrl);
+        this.imgUrl = imgUrl;
         this.latitudine = this.checkLatitudine(latitudine);
         this.longitudine = this.checkLongitudine(longitudine);
         this.id = id;
@@ -25,10 +27,10 @@ export class Circuito {
 
     //function that can accept only valid wikipediaURL from wikipedia.org
     checkWikipediaURL(wikipediaURL: string) {
-        if(wikipediaURL.indexOf('wikipedia.org') != -1)
+        if(wikipediaURL.indexOf('wikimedia.org') != -1)
             return wikipediaURL;
 
-        throw new Error('URL di Wikipedia non valido');
+        throw new Error('URL di Wikimedia non valido');
     }
 
     //funcion that can only accept valid latitudine
@@ -38,7 +40,7 @@ export class Circuito {
 
         throw new Error('Latitudine non valida');
     }
-     //funcion that can only accept valid longitudine
+    //funcion that can only accept valid longitudine
     private checkLongitudine(longitudine: number) {
         if(longitudine >= -180 && longitudine <= 180)
             return longitudine;
@@ -46,6 +48,7 @@ export class Circuito {
         throw new Error('Longitudine non valida');
     }
 
-    vettoreStagioni: Map<number, Stagione> = new Map<number, Stagione>();
+    vettoreStagioniGare: Map<Stagione, Gara> = new Map<Stagione, Gara>();
+
 
 }

@@ -3,17 +3,17 @@ import { Gara } from "./gara";
 import { Stagione } from "./stagione";
 
 export class Pilota {
-    readonly id: string;
-    readonly numero: number;
-    readonly abbreviazione: string;
-    readonly imgUrl: string;
-    readonly nome: string;
-    readonly cognome: string;
-    readonly dataDiNascita: Date;
-    readonly nazionalita: string;
+    id: string;
+    numero?: number;
+    abbreviazione?: string;
+    imgUrl: string;
+    nome: string;
+    cognome: string;
+    dataDiNascita: Date;
+    nazionalita: string;
 
-    constructor(id: string, numero: number, abbreviazione:string, imgUrl:string,
-        nome:string, cognome: string, datadiNascita: Date, nazionalita: string) {
+    constructor(id: string, imgUrl:string, nome:string, cognome: string,
+        datadiNascita: Date, nazionalita: string, numero?: number, abbreviazione?:string) {
             this.id=id;
             this.numero = numero;
             this.abbreviazione = abbreviazione;

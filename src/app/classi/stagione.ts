@@ -2,14 +2,17 @@ import { Classifica } from "./classifica";
 import { Gara } from "./gara";
 
 export class Stagione {
-    readonly anno: number;
+    anno: number;
 
     constructor(anno: number) {
         this.anno = anno;
+
+        this.gare = new Map<number, Gara>();
     }
 
-    // gare: Gara[];
+    gare: Map<number, Gara>;
     // classificaPiloti: Classifica;
     // classificaCostruttori: Classifica;
 
+    
 }
