@@ -12,6 +12,8 @@ export class Circuito {
     localita: string;
     paese: string;
 
+    vettoreStagioniGare: Map<Stagione, Gara> = new Map<Stagione, Gara>();
+
 
     //constructor that can accept all parameters and use setters to validate them
     constructor(id: string, nome: string, imgUrl: string, latitudine: number, longitudine: number, localita: string, paese: string) {
@@ -23,14 +25,6 @@ export class Circuito {
         this.nome = nome;
         this.localita = localita;
         this.paese = paese;
-    }
-
-    //function that can accept only valid wikipediaURL from wikipedia.org
-    checkWikipediaURL(wikipediaURL: string) {
-        if(wikipediaURL.indexOf('wikimedia.org') != -1)
-            return wikipediaURL;
-
-        throw new Error('URL di Wikimedia non valido');
     }
 
     //funcion that can only accept valid latitudine
@@ -47,8 +41,6 @@ export class Circuito {
 
         throw new Error('Longitudine non valida');
     }
-
-    vettoreStagioniGare: Map<Stagione, Gara> = new Map<Stagione, Gara>();
 
 
 }
