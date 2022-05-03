@@ -2,7 +2,10 @@
 <button (click)="stampa()">Stampa</button>
 <button (click)="caricaGareStagione(2022, 0)">Carica</button>
 
+<p>{{data.getMinutes()}}, {{data.getSeconds()}}, {{data.getMilliseconds()}}</p>
 <p>{{data}}</p>
+<p>{{test}}</p>
+<p>{{s.toString()}}</p>
 <div *ngIf="caricato()">
     <h1 *ngFor="let stagione of sortedArray()">Stagione {{stagione.anno}}</h1>
 </div>

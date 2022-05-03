@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Circuito } from '../classi/circuito';
+import { Tempo } from '../classi/classifica';
 import { Gara } from '../classi/gara';
 import { Stagione } from '../classi/stagione';
 import { ApiService } from '../servizi/api.service';
@@ -13,6 +14,9 @@ export class StagioniComponent implements OnInit {
 
   indiceCorrente: number;
   data: Date;
+  test:string[];
+
+  s: Tempo;
   
   //chacheStagioni: Map<number, Stagione>;
   //chacheStagioni: Stagione[];
@@ -20,8 +24,12 @@ export class StagioniComponent implements OnInit {
     //this.chacheStagioni = new Map<number, Stagione>();
     //this.chacheStagioni = new Array<Stagione>();
     this.indiceCorrente = 0;
-    this.data = new Date("1932-07-10 15:00:00Z");
+    this.data = new Date();
+    this.data.setHours(8003600)
+    //this.data.setMinutes(1, 31, 317);
     
+    this.test = "23.6".split(":");
+    this.s = Tempo.daMillisecondi(8269500);
   }
 
   ngOnInit(): void {
