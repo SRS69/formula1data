@@ -15,8 +15,13 @@ export class CostruttoriService {
   /**
    * Carica tutti i costruttori in cache
    */
-   getTuttiCostruttori() {
+   getTuttiCostruttori(): Array<Costruttore> | undefined{
     this.getTuttiCostruttoriRicorsivo(0);
+
+    if (this.apiService.cacheF1.costBool)
+      return Array.from(this.apiService.cacheF1.costruttori.values());
+
+    return undefined;
   }
   /**
    * Metodo ricorsivo per caricare tutti i costruttori in cache
@@ -56,7 +61,12 @@ export class CostruttoriService {
    * Carica un singolo costruttore in cache
    * @param id ID del costruttore da caricare
    */
-   getCostruttore(id: string) {
+   getCostruttore(id: string): Costruttore | undefined{
+
+    //Controllo se il costruttore è già in cache
+    if (this.apiService.cacheF1.costruttori.has(id))
+      return this.apiService.cacheF1.costruttori.get(id);
+
     //Richiesta API per il costruttore
     this.apiService.getDataF1Api(`https://ergast.com/api/f1/constructors/${id}.json`, 0).subscribe((costruttore: any) => {
       console.log(costruttore);
@@ -74,7 +84,11 @@ export class CostruttoriService {
         //Aggiunta del costruttore alla cache
         this.apiService.cacheF1.costruttori.set(costruttore.constructorId,
           new Costruttore(costruttore.constructorId, costruttore.name, immagine, costruttore.nationality));
+
+        return this.getCostruttore(id);
       });
     });
+
+    return undefined;
   }
 }

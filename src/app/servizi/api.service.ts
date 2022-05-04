@@ -4,6 +4,7 @@ import { Circuito } from '../classi/circuito';
 import { Costruttore } from '../classi/costruttore';
 import { Pilota } from '../classi/pilota';
 import { Stagione } from '../classi/stagione';
+import { StagioniService } from './stagioni.service';
 
 @Injectable({
   providedIn: 'root'
@@ -52,7 +53,6 @@ export class ApiService {
   getDataWikipedia(titoliPagine: Array<string>, dimensioni: number) {
     return this.http.get(`https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&indexpageids=1&redirects=1&prop=pageimages&piprop=thumbnail&pithumbsize=${dimensioni}&titles=${titoliPagine.join('%7C')}`);
   }
-
 
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   ///////FUNZIONI PER ESTRARRE I TITOLI DELLE PAGINE WIKI + FUNZIONE PER OTTENERE L'ID DELLA PAGINA DA UNA RICHIESTA WIKI////////
@@ -129,9 +129,27 @@ export class ApiService {
     });
     return -1;
   }
+
+  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  /////////////////////////////////////////////////////STAGIONI//////////////////////////////////////////////////////////////////
+  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  setStagione(stagione: Stagione) {
+    this.cacheF1.stagioni.set(stagione.anno, stagione);
+  }
+  getStagione(anno: number): Stagione | undefined {
+    return this.cacheF1.stagioni.get(anno);
+  }
+  getStagioniChache(): Map<number, Stagione> {
+    return this.cacheF1.stagioni;
+  }
 }
 
 export class CacheF1 {
+  stagBool: boolean = false;
+  pilBool: boolean = false;
+  costBool: boolean = false;
+  circBool: boolean = false;
+
   stagioni: Map<number, Stagione> = new Map<number, Stagione>();
   piloti: Map<string, Pilota> = new Map<string, Pilota>();
   costruttori: Map<string, Costruttore> = new Map<string, Costruttore>();

@@ -9,14 +9,19 @@ export class CircuitiService {
 
   constructor(private apiService: ApiService) { }
 
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   /////////////////////////////////////////////////////CIRCUITI//////////////////////////////////////////////////////////////////
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   /**
    * Carica tutti i circuiti in cache
    */
-   getTuttiCircuiti() {
+  getTuttiCircuiti(): Array<Circuito> | undefined{
     this.getTuttiCircuitiRicorsivo(0);
+    //Controllo se il booleano in cache è vero
+    if (this.apiService.cacheF1.circBool)
+      return Array.from(this.apiService.cacheF1.circuiti.values());
+
+    return undefined;
   }
   /**
    * Metodo ricorsivo per caricare tutti i circuiti in cache
@@ -59,7 +64,12 @@ export class CircuitiService {
    * Carica un singolo circuito in cache
    * @param id ID del circuito da caricare
    */
-  getCircuito(id: string) {
+  getCircuito(id: string): Circuito | undefined {
+
+    //Controllo se il circuito è già in cache
+    if (this.apiService.cacheF1.circuiti.has(id))
+      return this.apiService.cacheF1.circuiti.get(id);
+
     //Richiesta API per il circuito
     this.apiService.getDataF1Api(`https://ergast.com/api/f1/circuits/${id}.json`, 0).subscribe((circuito: any) => {
       console.log(circuito);
@@ -77,7 +87,11 @@ export class CircuitiService {
         //Aggiunta del circuito alla cache
         this.apiService.cacheF1.circuiti.set(circuito.circuitId, new Circuito(circuito.circuitId, circuito.circuitName, immagine,
           circuito.Location.lat, circuito.Location.long, circuito.Location.locality, circuito.Location.country));
+        
+        return this.getCircuito(id);
       });
     });
+
+    return undefined;
   }
 }

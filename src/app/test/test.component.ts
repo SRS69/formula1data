@@ -1,6 +1,8 @@
 import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { Circuito } from '../classi/circuito';
+import { Stagione } from '../classi/stagione';
+import { StagioniService } from '../servizi/stagioni.service';
 
 @Component({
   selector: 'app-test',
@@ -9,14 +11,19 @@ import { Circuito } from '../classi/circuito';
 })
 export class TestComponent implements OnInit {
 
-  constructor(private http: HttpClient) {
+  constructor(private http: HttpClient, private stagioniService: StagioniService) {
     this.loaded = 0;
     this.mappetta = new Map<number, string>();
     this.circuitoTest = new Circuito("monza", "Autodromo Nazionale di Monza", "https://en.wikipedia.org/wiki/Monza_Circuit", 19.48613, 9.28111, "Monza", "Italy");
     this.circuitoTest2 = new Circuito("bahrain", "Bahrain International Circuit", "http://en.wikipedia.org/wiki/Bahrain_International_Circuit", 26.0325, 50.5106, "Sakhir", "Bahrain");
   }
 
+  getTutteStagioni(): Array<Stagione> | undefined {
+    return this.stagioniService.getTutteStagioni();
+  }
+
   ngOnInit(): void {
+    console.log(this.getTutteStagioni())
     this.vettoreDati = undefined;
     this.loaded = 0;
   }

@@ -3,6 +3,23 @@
 <button (click)="testDati(0)" class="btn btn-outline btn-info">Test DaisyUI</button>
 <button (click)="testCircuito()" class="btn btn-outline btn-info">Test DaisyUI</button>
 
+<div class="overflow-x-auto">
+  <table class="table w-full">
+    <!-- head -->
+    <thead>
+      <tr>
+        <th>Anno</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let stagione of getTutteStagioni(); let i = index">
+        <td>{{stagione.anno}}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+
 <div *ngIf="vettoreDati != undefined" class="overflow-x-auto">
     <table class="table w-full">
       <!-- head -->

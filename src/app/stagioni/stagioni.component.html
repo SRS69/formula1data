@@ -6,7 +6,38 @@
 <p>{{data}}</p>
 <p>{{test}}</p>
 <p>{{s.toString()}}</p>
-<div *ngIf="caricato()">
-    <h1 *ngFor="let stagione of sortedArray()">Stagione {{stagione.anno}}</h1>
-</div>
 
+<!-- <button (click)="getTuttissimeStagioni()" class="btn btn-outline btn-info">carica stagioni</button> -->
+<!-- <div *ngIf="caricato()">
+    <h1 *ngFor="let stagione of sortedArray()">Stagione {{stagione.anno}}</h1>
+</div> -->
+
+<!-- <div class="overflow-x-auto">
+    <table class="table w-full">
+      <thead>
+        <tr>
+          <th>Anno</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let stagione of getTuttissimeStagioni(); let i = index">
+          <td>{{stagione.anno}}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div> -->
+
+  <div class="overflow-x-auto">
+    <table class="table w-full">
+      <thead>
+        <tr>
+          <th>Anno</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let stagione of getStagioniChache() | keyvalue; let i = index">
+          <td>{{stagione.key}}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>

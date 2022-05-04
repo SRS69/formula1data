@@ -17,9 +17,14 @@ export class PilotiService {
   /**
    * Carica tutti i piloti in cache
    */
-  getTuttiPiloti() {
+  getTuttiPiloti(): Array<Pilota> | undefined {
     this.getTuttiPilotiRicorsivo(0);
-
+    
+    //Controllo il booelano
+    if (this.apiService.cacheF1.pilBool) {
+      return Array.from(this.apiService.cacheF1.piloti.values());
+    }
+    return undefined;
   }
   /**
    * Metodo ricorsivo per caricare tutti i piloti in cache
@@ -60,7 +65,13 @@ export class PilotiService {
    * Carica un singolo pilota in cache
    * @param id ID del pilota da caricare
    */
-   getPilota(id: string) {
+   getPilota(id: string): Pilota | undefined{
+
+    //Controllo se è già in cache
+    if (this.apiService.cacheF1.piloti.has(id)) {
+      return this.apiService.cacheF1.piloti.get(id);
+    }
+
     //Richiesta API per il pilota
     this.apiService.getDataF1Api(`https://ergast.com/api/f1/driver/${id}.json`, 0).subscribe((pilota: any) => {
       console.log(pilota);
@@ -79,7 +90,11 @@ export class PilotiService {
         this.apiService.cacheF1.piloti.set(pilota.driverId,
           new Pilota(pilota.driverId, immagine, pilota.givenName, pilota.familyName, new Date(pilota.dateOfBirth),
           pilota.nationality, pilota.permanentNumber, pilota.code));
+
+        return this.getPilota(id);
       });
     });
+
+    return undefined;
   }
 }

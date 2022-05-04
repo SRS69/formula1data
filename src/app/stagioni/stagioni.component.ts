@@ -4,6 +4,7 @@ import { Tempo } from '../classi/classifica';
 import { Gara } from '../classi/gara';
 import { Stagione } from '../classi/stagione';
 import { ApiService } from '../servizi/api.service';
+import { StagioniService } from '../servizi/stagioni.service';
 
 @Component({
   selector: 'app-stagioni',
@@ -32,6 +33,14 @@ export class StagioniComponent implements OnInit {
     this.s = Tempo.daMillisecondi(8269500);
   }
 
+  // getTuttissimeStagioni(): Array<Stagione> | undefined {
+  //   return this.ApiService.getTutteStagioni();
+  // }
+
+  getStagioniChache(): Map<number, Stagione> {
+    console.log("stagioni cache");
+    return this.ApiService.getStagioniChache();
+  }
   ngOnInit(): void {
     //this.getTutteStagioni();
   }
