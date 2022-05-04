@@ -31,18 +31,34 @@ export class StagioniComponent implements OnInit {
     
     this.test = "23.6".split(":");
     this.s = Tempo.daMillisecondi(8269500);
+
+    this.ApiService.getTutteStagioni();
+    this.t = this.ApiService.cacheF1.stagioni;
+    this.t = new Map<number, Stagione>();
+    this.t.set(2022, new Stagione(2022));
+    console.log(this.t);
+
+    //console.log(this.ApiService.getStagione(2022));
   }
+
+  t: Map<number, Stagione>;
+
+  // getTutteStag(): Array<Stagione> {
+  //   console.warn("pre return");
+  //   return this.ApiService.getTutteStagioni();
+  // }
 
   // getTuttissimeStagioni(): Array<Stagione> | undefined {
   //   return this.ApiService.getTutteStagioni();
   // }
 
-  getStagioniChache(): Map<number, Stagione> {
-    console.log("stagioni cache");
-    return this.ApiService.getStagioniChache();
-  }
+  // getStagioniChache(): Map<number, Stagione> {
+  //   console.log("stagioni cache");
+  //   return this.ApiService.getStagioniChache();
+  // }
   ngOnInit(): void {
     //this.getTutteStagioni();
+    
   }
 
   caricato(): boolean {
@@ -58,13 +74,35 @@ export class StagioniComponent implements OnInit {
     this.getStagioni(0);
   }
 
+  
   stampa() {
     //console.log(this.chacheStagioni.keys().next().value);
     //console.log(this.ApiService.cacheF1.stagioni.delete(2022));
     //this.chacheStagioni.clear();
-    this.ApiService.cacheF1.stagioni.clear();
+    //this.ApiService.cacheF1.stagioni.clear();
     //console.log(this.chacheStagioni);
     console.log(this.ApiService.cacheF1);
+    console.log(this.ApiService.cacheF1.stagioni.get(2020));
+    console.log(this.t.get(2020));
+    console.log(this.ApiService.gett(2020));
+    console.log(this.ApiService.cacheF1.stagioni.values().next().value);
+    console.log(typeof this.ApiService.cacheF1.stagioni.keys().next().value);
+
+    //undefined :()
+    for (let i = 1950; i < this.ApiService.cacheF1.stagioni.size+1950; i++) {
+      console.log(this.ApiService.cacheF1.stagioni.get(i));
+    }
+    console.log(this.ApiService.cacheF1.stagioni);
+
+    //stampa giusto
+    this.ApiService.cacheF1.stagioni.forEach(stagione => {
+      console.log(this.ApiService.cacheF1.stagioni.get(stagione.anno));
+    });
+
+    let it = this.ApiService.cacheF1.stagioni.keys();
+    for (let i = 1950; i < this.ApiService.cacheF1.stagioni.size+1950; i++) {
+      console.log(typeof it.next().value);      
+    }
   }
   private getStagioni(offset: number) {
     //Richiesta API per ottenere le stagioni di F1

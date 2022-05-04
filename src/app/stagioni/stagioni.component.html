@@ -27,6 +27,21 @@
     </table>
   </div> -->
 
+<!-- <div class="overflow-x-auto">
+    <table class="table w-full">
+      <thead>
+        <tr>
+          <th>Anno</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let stagione of getTutteStag(); let i = index">
+          <td>{{stagione.anno}}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div> -->
+
   <div class="overflow-x-auto">
     <table class="table w-full">
       <thead>
@@ -35,7 +50,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let stagione of getStagioniChache() | keyvalue; let i = index">
+        <tr *ngFor="let stagione of t | keyvalue; let i = index">
           <td>{{stagione.key}}</td>
         </tr>
       </tbody>
