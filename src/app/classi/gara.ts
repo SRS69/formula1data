@@ -2,23 +2,33 @@ import { Circuito } from "./circuito";
 import { PostoClassifica, Tempo } from "./classifica";
 import { Costruttore } from "./costruttore";
 import { Pilota } from "./pilota";
+import { Stagione } from "./stagione";
 
 export class Gara {
     nome: string;
     round: number;
     data: Date;
     circuito: Circuito;
+    stagione: Stagione;
 
+    classificaGaraBool: boolean;
+    classificaQualificaBool: boolean;
+    classificaGiriBool: boolean;
     classificaGara: Map<number, PostoGara>;
     classificaQualifica: Map<number, PostoClassifica>;
     //numero giro, posizione
     classificaGiri: Map<number, Map<number, PostoGiro>>;
 
-    constructor(nome: string, round: number, data: Date, circuito: Circuito) {
+    constructor(nome: string, round: number, data: Date, circuito: Circuito, stagione: Stagione) {
         this.nome = nome;
         this.round = round;
         this.data = data;
         this.circuito = circuito;
+        this.stagione = stagione;
+
+        this.classificaGaraBool = false;
+        this.classificaQualificaBool = false;
+        this.classificaGiriBool = false;
 
         this.classificaGara = new Map<number, PostoGara>();
         this.classificaQualifica = new Map<number, PostoClassifica>();
@@ -47,7 +57,7 @@ abstract class PostoClassificaGara extends PostoClassifica {
 /**
  * Classe che rappresenta un posto in una classifica che riguarda una gara
  */
-class PostoGara extends PostoClassificaGara {
+export class PostoGara extends PostoClassificaGara {
     punti: number;
     griglia: number;
     giri: number;
@@ -68,7 +78,7 @@ class PostoGara extends PostoClassificaGara {
 /**
  * Classe che rappresenta un posto in una classifica che riguarda una qualifica per una gara
  */
-class PostoQualifica extends PostoClassificaGara {
+export class PostoQualifica extends PostoClassificaGara {
     costruttore: Costruttore;
     Q1: Tempo;
     Q2?: Tempo;
@@ -85,7 +95,7 @@ class PostoQualifica extends PostoClassificaGara {
 /**
  * Classe che rappresenta un posto in una classifica che riguarda un giro di una gara
  */
-class PostoGiro implements PostoClassificaGara {
+export class PostoGiro implements PostoClassificaGara {
     posizione: number;
     pilota: Pilota;
     gara: Gara;

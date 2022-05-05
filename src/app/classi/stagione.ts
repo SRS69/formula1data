@@ -12,8 +12,16 @@ export class Stagione {
         this.gare = new Map<number, Gara>();
         this.classificaPiloti = new Map<number, PostoClassificaPiloti>();
         this.classificaCostruttori = new Map<number, PostoClassificaCostruttori>();
+
+        this.gareBool = false;
+        this.classificaPilotiBool = false;
+        this.classificaCostruttoriBool = false;
     }
 
+    classificaPilotiBool: boolean;
+    classificaCostruttoriBool: boolean;
+
+    gareBool: boolean;
     gare: Map<number, Gara>;
     classificaPiloti: Map<number, PostoClassificaPiloti>;
     classificaCostruttori: Map<number, PostoClassificaCostruttori>;
@@ -43,7 +51,7 @@ abstract class PostoClassificaStagione extends PostoClassifica {
 /**
  * Classe che rappresenta un posto in una classifica che riguarda i piloti
  */
-class PostoClassificaPiloti extends PostoClassificaStagione {
+export class PostoClassificaPiloti extends PostoClassificaStagione {
     pilota: Pilota;
 
     constructor(stagione:Stagione, posizione: number, punti: number, vittorie: number, costruttore: Costruttore, pilota: Pilota) {
@@ -54,7 +62,7 @@ class PostoClassificaPiloti extends PostoClassificaStagione {
 /**
  * Classe che rappresenta un posto in una classifica che riguarda i costruttori
  */
-class PostoClassificaCostruttori extends PostoClassificaStagione {
+export class PostoClassificaCostruttori extends PostoClassificaStagione {
     constructor(stagione:Stagione, posizione: number, punti: number, vittorie: number, costruttore: Costruttore) {
         super(stagione, posizione, punti, vittorie, costruttore);
     }

@@ -33,7 +33,7 @@ export class StagioniComponent implements OnInit {
     this.s = Tempo.daMillisecondi(8269500);
 
     this.ApiService.getTutteStagioni();
-    this.t = this.ApiService.cacheF1.stagioni;
+    //this.t = this.ApiService.cacheF1.stagioni;
     this.t = new Map<number, Stagione>();
     this.t.set(2022, new Stagione(2022));
     console.log(this.t);
@@ -60,7 +60,7 @@ export class StagioniComponent implements OnInit {
     //this.getTutteStagioni();
     
   }
-
+/*
   caricato(): boolean {
     return this.ApiService.cacheF1.stagioni.size > 0;
   }
@@ -69,7 +69,8 @@ export class StagioniComponent implements OnInit {
     console.log("reload vettore :)");
     return Array.from(this.ApiService.cacheF1.stagioni.values()).sort((a, b) => a.anno > b.anno ? -1 : 1);
   }
-
+  */
+/*
   getTutteStagioni() {
     this.getStagioni(0);
   }
@@ -161,6 +162,6 @@ export class StagioniComponent implements OnInit {
       // console.log(this.ApiService.cacheF1);
       // console.log(this.sortedArray());
     });
-  }
+  }*/
 
 }
