@@ -12,7 +12,8 @@ export class Circuito {
     localita: string;
     paese: string;
 
-    vettoreStagioniGare: Map<Stagione, Gara> = new Map<Stagione, Gara>();
+    stagioniBool: boolean;
+    vettoreStagioniGare: Map<number, Gara> = new Map<number, Gara>();
 
 
     //constructor that can accept all parameters and use setters to validate them
@@ -25,6 +26,8 @@ export class Circuito {
         this.nome = nome;
         this.localita = localita;
         this.paese = paese;
+
+        this.stagioniBool = false;
     }
 
     //funcion that can only accept valid latitudine

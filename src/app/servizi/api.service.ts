@@ -519,7 +519,7 @@ export class ApiService {
 
     //Prendo il circuito
     const circuito: Circuito | undefined = await this.getCircuito(gara.MRData.RaceTable.Races[0].Circuit.circuitId)
-    if(circuito === undefined)
+    if (circuito === undefined)
       throw new Error("Errore nel caricamente del circuito nella gara");
 
     stagione.gare.set(parseInt(gara.round), new Gara(gara.raceName,
@@ -633,16 +633,16 @@ export class ApiService {
       classificaGara.MRData.RaceTable.Races[0].Results.forEach(async (posizione: any) => {
         //prendo il pilota
         const pilota: Pilota | undefined = await this.getPilota(posizione.Driver.driverId);
-        if(pilota === undefined)
+        if (pilota === undefined)
           throw new Error("Errore nel caricamento della pilota nella classifica");
         const costruttore: Costruttore | undefined = await this.getCostruttore(posizione.Constructor.constructorId);
-        if(costruttore === undefined)
+        if (costruttore === undefined)
           throw new Error("Errore nel caricamento del costruttore nella classifica");
 
         gara.classificaGara.set(parseInt(posizione.position),
           new PostoGara(parseInt(posizione.position), pilota, costruttore, parseInt(posizione.laps),
-          parseInt(posizione.grid), parseInt(posizione.points), (posizione.status === "Finished"),
-          gara, new Tempo(posizione.Time.millis)));
+            parseInt(posizione.grid), parseInt(posizione.points), (posizione.status === "Finished"),
+            gara, new Tempo(posizione.Time.millis)));
       });
 
       //Controllo se bisogna fare altre richieste API
@@ -651,7 +651,201 @@ export class ApiService {
       } else if (gara.classificaGara.size == classificaGara.MRData.total) {
         gara.classificaGaraBool = true;
       }
-      
+
+    }
+  }
+
+  //Aggiutna dei costruttori a un pilota
+  async getCostruttoriPilota(id: string): Promise<Costruttore[]> {
+    const pilota: Pilota | undefined = await this.getPilota(id);
+    if (pilota === undefined)
+      throw new Error("Errore nel caricamento dei costruttori del pilota");
+
+    //Prendo i costruttori
+    if (!pilota.costruttoriBool)
+      await this.getCostruttoriPilotaRicorsivo(pilota, 0);
+
+    return pilota.costruttori;
+  }
+  private async getCostruttoriPilotaRicorsivo(pilota: Pilota, offset: number) {
+    if (!pilota.costruttoriBool) {
+      //Richiesta API per ottenere i costruttori
+      const costruttori: any = await this.getDataF1Api(`https://ergast.com/api/f1/drivers/${pilota.id}/constructors.json`, offset);
+      console.log(costruttori);
+
+      //Inserisco i costruttori nella cache
+      costruttori.MRData.ConstructorTable.Constructors.forEach(async (costruttoreFromData: any) => {
+        const costruttore: Costruttore | undefined = await this.getCostruttore(costruttoreFromData.constructorId);
+        if (costruttore === undefined)
+          throw new Error("Errore nel caricamento del costruttore nel pilota");
+
+        pilota.costruttori.push(costruttore);
+      });
+
+      //Controllo se bisogna fare altre richieste API
+      if (pilota.costruttori.length < costruttori.MRData.total) {
+        this.getCostruttoriPilotaRicorsivo(pilota, offset + costruttori.MRData.onstructorTable.Constructors.length);
+      } else if (pilota.costruttori.length == costruttori.MRData.total) {
+        pilota.costruttoriBool = true;
+      }
+    }
+  }
+
+
+  //Aggiunta stagioni pilota
+  async getStagioniERisultatoPilota(id: string) {
+    const pilota: Pilota | undefined = await this.getPilota(id);
+    if (pilota === undefined)
+      throw new Error("Errore nel caricamento del pilota");
+
+    //Prendo le stagioni e posizioni
+    if (!pilota.stagioniBool)
+      await this.getStagioniERisultatoPilotaRicorsivo(pilota, 0);
+
+    return Array.from(pilota.stagioniERisultato.values()).sort((
+      a: PostoClassificaPiloti, b: PostoClassificaPiloti) => b.stagione.anno - a.stagione.anno);
+  }
+  private async getStagioniERisultatoPilotaRicorsivo(pilota: Pilota, offset: number) {
+    if (!pilota.stagioniBool) {
+      const stagioniEPosizione: any = await lastValueFrom(this.getDataF1Api(`https://ergast.com/api/f1/drivers/${pilota.id}/driverStandings.json`, offset));
+      console.log(stagioniEPosizione);
+
+      //Inserisco le stagioni e risultati nella cache
+      stagioniEPosizione.MRData.StandingsTable.StandingsLists.forEach(async (posizione: any) => {
+        const stagione: Stagione | undefined = await this.getStagione(posizione.season);
+        if (stagione === undefined)
+          throw new Error("Errore nel caricamento della stagione nel pilota");
+
+        await this.getClassificaPilotiStagione(posizione.season);
+
+        const postoStagione: PostoClassificaPiloti | undefined = stagione.classificaPiloti.get(posizione.DriverStandings.position);
+        if (postoStagione === undefined)
+          throw new Error("Errore nel caricamento della posizione nel pilota");
+
+        pilota.stagioniERisultato.set(stagione.anno, postoStagione);
+      });
+
+      //Controllo se bisogna fare altre richieste API
+      if (pilota.stagioniERisultato.size < stagioniEPosizione.MRData.total) {
+        this.getStagioniERisultatoPilotaRicorsivo(pilota, offset + stagioniEPosizione.MRData.StandingsTable.StandingsLists.length);
+      } else if (pilota.stagioniERisultato.size == stagioniEPosizione.MRData.total) {
+        pilota.stagioniBool = true;
+      }
+    }
+  }
+
+
+  async getPilotiCostruttore(id: string) {
+    const costruttore: Costruttore | undefined = await this.getCostruttore(id);
+    if(costruttore === undefined)
+      throw new Error("Errore nel caricamento del costruttore");
+
+    //Prendo i piloti
+    if(!costruttore.pilotiBool)
+      await this.getPilotiCostruttoreRicorsivo(costruttore, 0);
+
+    return costruttore.piloti;
+  }
+  private async getPilotiCostruttoreRicorsivo(costruttore: Costruttore, offset: number) {
+    if(!costruttore.pilotiBool) {
+      const piloti: any = await lastValueFrom(this.getDataF1Api(`https://ergast.com/api/f1/constructors/${costruttore.id}/drivers.json`, offset));
+      console.log(piloti);
+
+      //Inserisco i piloti nella cache
+      piloti.MRData.DriverTable.Drivers.forEach(async (pilotaData: any) => {
+        const pilota: Pilota | undefined = await this.getPilota(pilotaData.driverId);
+        if(pilota === undefined)
+          throw new Error("Errore nel caricamento del pilota nel costruttore")
+
+        costruttore.piloti.push(pilota);
+      });
+
+      //Controllo se devo fare altre richieste
+      if(costruttore.piloti.length < piloti.MRData.total) {
+        this.getPilotiCostruttoreRicorsivo(costruttore, offset+piloti.MRData.DriverTable.Drivers.length);
+      } else if (costruttore.piloti.length == piloti.MRData.total) {
+        costruttore.pilotiBool = true;
+      }
+    }
+  }
+
+
+  //Aggiunta stagioni costruttore
+  async getStagioniERisultatoCostruttore(id: string) {
+    const costruttore: Costruttore | undefined = await this.getCostruttore(id);
+    if (costruttore === undefined)
+      throw new Error("Errore nel caricamento del pilota");
+
+    //Prendo le stagioni e posizioni
+    if (!costruttore.stagioniBool)
+      await this.getStagioniERisultatoCostruttoreicorsivo(costruttore, 0);
+
+    return Array.from(costruttore.stagioniEGare.values()).sort((
+      a: PostoClassificaCostruttori, b: PostoClassificaCostruttori) => b.stagione.anno - a.stagione.anno);
+  }
+  private async getStagioniERisultatoCostruttoreicorsivo(costruttore: Costruttore, offset: number) {
+    if (!costruttore.stagioniBool) {
+      const stagioniEPosizione: any = await lastValueFrom(this.getDataF1Api(`https://ergast.com/api/f1/constructors/${costruttore.id}/constructorStandings.json`, offset));
+      console.log(stagioniEPosizione);
+
+      //Inserisco le stagioni e risultati nella cache
+      stagioniEPosizione.MRData.StandingsTable.StandingsLists.forEach(async (posizione: any) => {
+        const stagione: Stagione | undefined = await this.getStagione(posizione.season);
+        if (stagione === undefined)
+          throw new Error("Errore nel caricamento della stagione nel costruttore");
+
+        await this.getClassificaCostruttoriStagione(posizione.season);
+
+        const postoStagione: PostoClassificaCostruttori | undefined = stagione.classificaCostruttori.get(posizione.ConstructorStandings.position);
+        if (postoStagione === undefined)
+          throw new Error("Errore nel caricamento della posizione nel costruttore");
+
+        costruttore.stagioniEGare.set(stagione.anno, postoStagione);
+      });
+
+      //Controllo se bisogna fare altre richieste API
+      if (costruttore.stagioniEGare.size < stagioniEPosizione.MRData.total) {
+        this.getStagioniERisultatoCostruttoreicorsivo(costruttore, offset + stagioniEPosizione.MRData.StandingsTable.StandingsLists.length);
+      } else if (costruttore.stagioniEGare.size == stagioniEPosizione.MRData.total) {
+        costruttore.stagioniBool = true;
+      }
+    }
+  }
+
+
+  //Carica gare
+  async getGareCircuito(id: string) {
+    const circuito: Circuito | undefined = await this.getCircuito(id);
+    if(circuito === undefined)
+      throw new Error("Errore nel caricamento del circuito");
+
+    //Prendo le gare
+    if(!circuito.stagioniBool)
+      await this.getGareCircuitoRicorsivo(circuito, 0);
+
+    return Array.from(circuito.vettoreStagioniGare.values()).sort((
+      a: Gara, b: Gara) => b.stagione.anno - a.stagione.anno);;
+  }
+  private async getGareCircuitoRicorsivo(circuito: Circuito, offset: number) {
+    if(!circuito.stagioniBool) {
+      const gareCircuito: any = await lastValueFrom(this.getDataF1Api(`https://ergast.com/api/f1/circuits/${circuito.id}/results/1.json`, offset));
+      console.log(gareCircuito);
+
+      //Inserisco le gare nella cache
+      gareCircuito.MRData.RaceTable.Races.forEach(async (garaData: any) => {
+        const gara: Gara | undefined = await this.getGaraStagione(garaData.season, garaData.round);
+        if(gara === undefined)
+          throw new Error("Errore nel caricare la gara nel circuito");
+
+        circuito.vettoreStagioniGare.set(gara.stagione.anno, gara);
+      });
+
+      //Controllo se devo fare altre richieste
+      if(circuito.vettoreStagioniGare.size < gareCircuito.MRData.total) {
+        this.getGareCircuitoRicorsivo(circuito, offset+gareCircuito.MRData.RaceTable.Races.length);
+      } else if (circuito.vettoreStagioniGare.size == gareCircuito.MRData.total) {
+        circuito.stagioniBool = true;
+      }
     }
   }
 
@@ -701,7 +895,7 @@ export class ApiService {
     }
   }*/
 
-  
+
 }
 
 export class CacheF1 {

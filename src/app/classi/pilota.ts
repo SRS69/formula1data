@@ -1,6 +1,6 @@
 import { Costruttore } from "./costruttore";
 import { Gara } from "./gara";
-import { Stagione } from "./stagione";
+import { PostoClassificaPiloti, Stagione } from "./stagione";
 
 export class Pilota {
     id: string;
@@ -23,14 +23,21 @@ export class Pilota {
         this.dataDiNascita = datadiNascita;
         this.nazionalita = nazionalita;
 
+        this.costruttoriBool = false;
         this.costruttori = new Array<Costruttore>();
-        this.stagioniEGare = new Map<Map<number, Stagione>, Map<number, Gara>>();
+        //this.stagioniEGare = new Map<Map<number, Stagione>, Map<number, Gara>>();
+        this.stagioniERisultato = new Map<number, PostoClassificaPiloti>();
+        this.stagioniBool = false;
     }
 
+    costruttoriBool: boolean;
     gareVinte?: number;
     stagioniVinte?: number;
     costruttori: Costruttore[];
     
     //anno, stagione    round, gara
-    stagioniEGare: Map<Map<number, Stagione>, Map<number, Gara>>;
+    //stagioniEGare: Map<Map<number, Stagione>, Map<number, Gara>>;
+    //anno, stagione        nposizione, posizione
+    stagioniBool: boolean;
+    stagioniERisultato: Map<number, PostoClassificaPiloti>;
 }
