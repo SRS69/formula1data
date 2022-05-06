@@ -137,6 +137,7 @@ export class ApiService {
     return -1;
   }
 
+
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   /////////////////////////////////////////////////////STAGIONI//////////////////////////////////////////////////////////////////
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -145,9 +146,9 @@ export class ApiService {
    * Carica tutte le stagioni in cache
    * @returns Array contenente le stagioni presenti in cache
    */
-  getTutteStagioni(): Stagione[] {
+  async getTutteStagioni(): Promise<Stagione[]> {
     if (!this.cacheF1.stagBool && !this.ricorsioneStagioni)
-      this.getTutteStagioniRicorsivo(0);
+      await this.getTutteStagioniRicorsivo(0);
 
     //Restituisce le stagioni presenti in cache ordinate per anno
     return Array.from(this.cacheF1.stagioni.values()).sort((a, b) => b.anno - a.anno);
@@ -157,28 +158,28 @@ export class ApiService {
    * Metodo ricorsivo per caricare tutte le stagioni in cache
    * @param offset Scostamento dalla prima stagione per la chiamata API
    */
-  private getTutteStagioniRicorsivo(offset: number) {
+  private async getTutteStagioniRicorsivo(offset: number) {
     this.ricorsioneStagioni = true;
     if (!this.cacheF1.stagBool) {
       //Richiesta API per ottenere le stagioni di F1 presenti dopo l'offset
-      this.getDataF1Api('https://ergast.com/api/f1/seasons.json', offset).subscribe((stagioni: any) => {
-        console.log(stagioni);
+      const stagioni: any = await lastValueFrom(this.getDataF1Api('https://ergast.com/api/f1/seasons.json', offset));
+      console.log(stagioni);
 
-        //Inseriemento delle stagioni nella cache
-        stagioni.MRData.SeasonTable.Seasons.forEach((stagione: any) => {
-          this.cacheF1.stagioni.set(parseInt(stagione.season), new Stagione(parseInt(stagione.season)));
-        });
-
-        //Controllo se bisogna fare altre chiamate API (API funziona con un sistema di paging)
-        if (this.cacheF1.stagioni.size < stagioni.MRData.total) {
-          this.getTutteStagioniRicorsivo(offset + stagioni.MRData.SeasonTable.Seasons.length);
-        }
-        //Aggiorno il booleano che indica che le stagioni sono tutte state caricate in cache
-        else if (this.cacheF1.stagioni.size == stagioni.MRData.total) {
-          this.cacheF1.stagBool = true;
-          this.ricorsioneStagioni = false;
-        }
+      //Inseriemento delle stagioni nella cache
+      stagioni.MRData.SeasonTable.Seasons.forEach((stagione: any) => {
+        this.cacheF1.stagioni.set(parseInt(stagione.season), new Stagione(parseInt(stagione.season)));
       });
+
+      //Controllo se bisogna fare altre chiamate API (API funziona con un sistema di paging)
+      if (this.cacheF1.stagioni.size < stagioni.MRData.total) {
+        this.getTutteStagioniRicorsivo(offset + stagioni.MRData.SeasonTable.Seasons.length);
+      }
+      //Aggiorno il booleano che indica che le stagioni sono tutte state caricate in cache
+      else if (this.cacheF1.stagioni.size == stagioni.MRData.total) {
+        this.cacheF1.stagBool = true;
+        this.ricorsioneStagioni = false;
+      }
+
     }
 
     console.warn(this.cacheF1);
@@ -291,10 +292,6 @@ export class ApiService {
     return this.cacheF1.circuiti.get(id);
   }
 
-  gett(anno: number): Stagione | undefined {
-    return this.cacheF1.getStagione(anno);
-  }
-
 
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   ///////////////////////////////////////////////////////PILOTI//////////////////////////////////////////////////////////////////
@@ -303,9 +300,9 @@ export class ApiService {
   /**
    * Carica tutti i piloti in cache
    */
-  getTuttiPiloti(): Pilota[] {
+  async getTuttiPiloti(): Promise<Pilota[]> {
     if (!this.cacheF1.pilBool && !this.ricorsionePiloti)
-      this.getTuttiPilotiRicorsivo(0);
+      await this.getTuttiPilotiRicorsivo(0);
 
     return Array.from(this.cacheF1.piloti.values());
   }
@@ -313,39 +310,37 @@ export class ApiService {
    * Metodo ricorsivo per caricare tutti i piloti in cache
    * @param offset Scostamento dal primo pilota per la chiamata API
    */
-  private getTuttiPilotiRicorsivo(offset: number) {
+  private async getTuttiPilotiRicorsivo(offset: number) {
     this.ricorsionePiloti = true;
     //Richiesta API per ottenere i piloti di F1
-    this.getDataF1Api('https://ergast.com/api/f1/drivers.json', offset).subscribe((piloti: any) => {
-      console.log(piloti);
+    const piloti: any = await lastValueFrom(this.getDataF1Api('https://ergast.com/api/f1/drivers.json', offset));
+    console.log(piloti);
 
-      //Richiesta API wiki per ottenere le immagini di tutti i circuiti
-      this.getDataWikipedia(this.estraiTitoliDaVettoreGenerico(piloti.MRData.DriverTable.Drivers), this.imageSize).subscribe((wikiData: any) => {
-        console.log(wikiData);
+    //Richiesta API wiki per ottenere le immagini di tutti i circuiti
+    const wikiData: any = await lastValueFrom(this.getDataWikipedia(this.estraiTitoliDaVettoreGenerico(piloti.MRData.DriverTable.Drivers), this.imageSize));
+      console.log(wikiData);
 
-        //Inserimento dei piloti nella cache
-        piloti.MRData.DriverTable.Drivers.forEach((pilota: any) => {
+      //Inserimento dei piloti nella cache
+      piloti.MRData.DriverTable.Drivers.forEach((pilota: any) => {
 
-          //Link dell'immagine del pilota
-          let immagine: string | undefined;
-          immagine = wikiData.query.pages[wikiData.query.pageids[this.wikiFromTitleToId(this.estraiTitoliDaUrls([pilota.url])[0], wikiData)]]?.thumbnail.source;
-          if (immagine === undefined)
-            immagine = this.placeholder;
+        //Link dell'immagine del pilota
+        let immagine: string | undefined;
+        immagine = wikiData.query.pages[wikiData.query.pageids[this.wikiFromTitleToId(this.estraiTitoliDaUrls([pilota.url])[0], wikiData)]]?.thumbnail.source;
+        if (immagine === undefined)
+          immagine = this.placeholder;
 
-          //Aggiunta del pilota alla cache
-          this.cacheF1.piloti.set(pilota.driverId,
-            new Pilota(pilota.driverId, immagine, pilota.givenName, pilota.familyName, new Date(pilota.dateOfBirth), pilota.nationality, pilota.permanentNumber, pilota.code));
+        //Aggiunta del pilota alla cache
+        this.cacheF1.piloti.set(pilota.driverId,
+          new Pilota(pilota.driverId, immagine, pilota.givenName, pilota.familyName, new Date(pilota.dateOfBirth), pilota.nationality, pilota.permanentNumber, pilota.code));
 
-        });
 
-        //Controllo se bisogna fare altre richieste API
-        if (this.cacheF1.piloti.size < piloti.MRData.total) {
-          this.getTuttiPilotiRicorsivo(offset + piloti.MRData.DriverTable.Drivers.length);
-        } else if (this.cacheF1.piloti.size == piloti.MRData.total) {
-          this.cacheF1.pilBool = true;
-          this.ricorsionePiloti = false;
-        }
-      });
+      //Controllo se bisogna fare altre richieste API
+      if (this.cacheF1.piloti.size < piloti.MRData.total) {
+        this.getTuttiPilotiRicorsivo(offset + piloti.MRData.DriverTable.Drivers.length);
+      } else if (this.cacheF1.piloti.size == piloti.MRData.total) {
+        this.cacheF1.pilBool = true;
+        this.ricorsionePiloti = false;
+      }
     });
 
     console.warn(this.cacheF1);
@@ -737,32 +732,32 @@ export class ApiService {
 
   async getPilotiCostruttore(id: string) {
     const costruttore: Costruttore | undefined = await this.getCostruttore(id);
-    if(costruttore === undefined)
+    if (costruttore === undefined)
       throw new Error("Errore nel caricamento del costruttore");
 
     //Prendo i piloti
-    if(!costruttore.pilotiBool)
+    if (!costruttore.pilotiBool)
       await this.getPilotiCostruttoreRicorsivo(costruttore, 0);
 
     return costruttore.piloti;
   }
   private async getPilotiCostruttoreRicorsivo(costruttore: Costruttore, offset: number) {
-    if(!costruttore.pilotiBool) {
+    if (!costruttore.pilotiBool) {
       const piloti: any = await lastValueFrom(this.getDataF1Api(`https://ergast.com/api/f1/constructors/${costruttore.id}/drivers.json`, offset));
       console.log(piloti);
 
       //Inserisco i piloti nella cache
       piloti.MRData.DriverTable.Drivers.forEach(async (pilotaData: any) => {
         const pilota: Pilota | undefined = await this.getPilota(pilotaData.driverId);
-        if(pilota === undefined)
+        if (pilota === undefined)
           throw new Error("Errore nel caricamento del pilota nel costruttore")
 
         costruttore.piloti.push(pilota);
       });
 
       //Controllo se devo fare altre richieste
-      if(costruttore.piloti.length < piloti.MRData.total) {
-        this.getPilotiCostruttoreRicorsivo(costruttore, offset+piloti.MRData.DriverTable.Drivers.length);
+      if (costruttore.piloti.length < piloti.MRData.total) {
+        this.getPilotiCostruttoreRicorsivo(costruttore, offset + piloti.MRData.DriverTable.Drivers.length);
       } else if (costruttore.piloti.length == piloti.MRData.total) {
         costruttore.pilotiBool = true;
       }
@@ -816,33 +811,33 @@ export class ApiService {
   //Carica gare
   async getGareCircuito(id: string) {
     const circuito: Circuito | undefined = await this.getCircuito(id);
-    if(circuito === undefined)
+    if (circuito === undefined)
       throw new Error("Errore nel caricamento del circuito");
 
     //Prendo le gare
-    if(!circuito.stagioniBool)
+    if (!circuito.stagioniBool)
       await this.getGareCircuitoRicorsivo(circuito, 0);
 
     return Array.from(circuito.vettoreStagioniGare.values()).sort((
       a: Gara, b: Gara) => b.stagione.anno - a.stagione.anno);;
   }
   private async getGareCircuitoRicorsivo(circuito: Circuito, offset: number) {
-    if(!circuito.stagioniBool) {
+    if (!circuito.stagioniBool) {
       const gareCircuito: any = await lastValueFrom(this.getDataF1Api(`https://ergast.com/api/f1/circuits/${circuito.id}/results/1.json`, offset));
       console.log(gareCircuito);
 
       //Inserisco le gare nella cache
       gareCircuito.MRData.RaceTable.Races.forEach(async (garaData: any) => {
         const gara: Gara | undefined = await this.getGaraStagione(garaData.season, garaData.round);
-        if(gara === undefined)
+        if (gara === undefined)
           throw new Error("Errore nel caricare la gara nel circuito");
 
         circuito.vettoreStagioniGare.set(gara.stagione.anno, gara);
       });
 
       //Controllo se devo fare altre richieste
-      if(circuito.vettoreStagioniGare.size < gareCircuito.MRData.total) {
-        this.getGareCircuitoRicorsivo(circuito, offset+gareCircuito.MRData.RaceTable.Races.length);
+      if (circuito.vettoreStagioniGare.size < gareCircuito.MRData.total) {
+        this.getGareCircuitoRicorsivo(circuito, offset + gareCircuito.MRData.RaceTable.Races.length);
       } else if (circuito.vettoreStagioniGare.size == gareCircuito.MRData.total) {
         circuito.stagioniBool = true;
       }
