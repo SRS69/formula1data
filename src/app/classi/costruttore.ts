@@ -18,15 +18,15 @@ export class Costruttore {
         this.piloti = new Array<Pilota>();
         this.stagioniBool = false;
         this.stagioniEGare = new Map<number, PostoClassificaCostruttori>();
+
+        this.stagioniVinte = 0;
     }
 
     pilotiBool: boolean;
     piloti: Pilota[];
-    stagioniVinte?: number;
-    gareVinte?: number;
 
+    stagioniVinte: number;
 
     stagioniBool: boolean;
-    //anno, stagione    round, gara
     stagioniEGare: Map<number, PostoClassificaCostruttori>;
 }

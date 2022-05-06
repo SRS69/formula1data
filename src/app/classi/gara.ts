@@ -1,5 +1,4 @@
 import { Circuito } from "./circuito";
-import { PostoClassifica, Tempo } from "./classifica";
 import { Costruttore } from "./costruttore";
 import { Pilota } from "./pilota";
 import { Stagione } from "./stagione";
@@ -15,9 +14,6 @@ export class Gara {
     classificaQualificaBool: boolean;
     classificaGiriBool: boolean;
     classificaGara: Map<number, PostoGara>;
-    classificaQualifica: Map<number, PostoClassifica>;
-    //numero giro, posizione
-    classificaGiri: Map<number, Map<number, PostoGiro>>;
 
     constructor(nome: string, round: number, data: Date, circuito: Circuito, stagione: Stagione) {
         this.nome = nome;
@@ -31,8 +27,6 @@ export class Gara {
         this.classificaGiriBool = false;
 
         this.classificaGara = new Map<number, PostoGara>();
-        this.classificaQualifica = new Map<number, PostoClassifica>();
-        this.classificaGiri = new Map<number, Map<number, PostoGiro>>();
     }
     
 }
@@ -42,31 +36,23 @@ export class Gara {
 ///////////////////////////////////////////////////CLASSIFICA//////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
- * Classe abstarct che rappresenta un posto in una classifica generica che riguarda una gara di F1
- */
-abstract class PostoClassificaGara extends PostoClassifica {
-    pilota: Pilota;
-    gara: Gara;
-
-    constructor(posizione: number, pilota: Pilota, gara: Gara) {
-        super(posizione);
-        this.pilota = pilota;
-        this.gara = gara;
-    }
-}
-/**
  * Classe che rappresenta un posto in una classifica che riguarda una gara
  */
-export class PostoGara extends PostoClassificaGara {
-    punti: number;
-    griglia: number;
-    giri: number;
-    finito: boolean;
-    costruttore: Costruttore;
-    tempo?: Tempo;
+export class PostoGara {
+    readonly posizione: number;
+    readonly pilota: Pilota;
+    readonly gara: Gara;
+    readonly punti: number;
+    readonly griglia: number;
+    readonly giri: number;
+    readonly finito: boolean;
+    readonly costruttore: Costruttore;
+    readonly tempo?: Tempo;
 
     constructor(posizione: number, pilota: Pilota, costruttore: Costruttore, giri: number, griglia: number, punti: number, finito: boolean, gara: Gara, tempo?: Tempo) {
-        super(posizione, pilota, gara);
+        this.posizione = posizione;
+        this.pilota = pilota;
+        this.gara = gara;
         this.costruttore = costruttore;
         this.giri = giri;
         this.griglia = griglia;
@@ -75,39 +61,74 @@ export class PostoGara extends PostoClassificaGara {
         this.finito = finito;
     }
 }
-/**
- * Classe che rappresenta un posto in una classifica che riguarda una qualifica per una gara
- */
-export class PostoQualifica extends PostoClassificaGara {
-    costruttore: Costruttore;
-    Q1: Tempo;
-    Q2?: Tempo;
-    Q3?: Tempo;
 
-    constructor(posizione: number, pilota: Pilota, costruttore: Costruttore, gara: Gara, Q1: Tempo, Q2?: Tempo, Q3?: Tempo) {
-        super(posizione, pilota, gara);
-        this.costruttore = costruttore;
-        this.Q1 = Q1;
-        this.Q2 = Q2;
-        this.Q3 = Q3;
+export class Tempo {
+    ore?: number;
+    minuti?: number;
+    secondi: number;
+    millisecondi: number;
+
+    /**
+     * Partendo da una stringa in formato [ore:minuti:secondi.millesimi] (2:17:49.5)  costruisce un oggetto Tempo
+     * 
+     * @param tempo Stringa contenente il tempo
+     */
+    constructor(tempo: string) {
+        //Divisione della stringa data in input
+        let tempoVettore: string[] = tempo.split(":");
+        //Separazione secondi e millisecondi
+        let secMill: string[] = tempoVettore[tempoVettore.length - 1].split(".");
+
+        //Assegnazione dei valori
+        this.secondi = parseInt(secMill[0]);
+        this.millisecondi = parseInt(secMill[1]);
+        if (tempoVettore.length > 1) {
+            this.minuti = parseInt(tempoVettore[tempoVettore.length - 2]);
+            if (tempoVettore.length > 2) {
+                this.ore = parseInt(tempoVettore[tempoVettore.length - 3]);
+            }
+        }
     }
-}
-/**
- * Classe che rappresenta un posto in una classifica che riguarda un giro di una gara
- */
-export class PostoGiro implements PostoClassificaGara {
-    posizione: number;
-    pilota: Pilota;
-    gara: Gara;
 
-    nGiro: number;
-    tempo?: Tempo;
+    /**
+     * Dando in input il tempo in millisecondi costruisce un oggetto Tempo
+     * 
+     * @param millisecondi Tempo in millisecondi
+     * @returns Oggetto Tempo
+     */
+    static daMillisecondi(millisecondi: number): Tempo {
+        //Oggetto Tempo base
+        let tempo: Tempo = new Tempo("0:0:0.0");
+        //Assegnazione dei valori
+        tempo.millisecondi = millisecondi % 1000;
+        tempo.secondi = Math.floor(millisecondi / 1000) % 60;
+        tempo.minuti = Math.floor(millisecondi / 60000) % 60;
+        tempo.ore = Math.floor(millisecondi / 3600000);
 
-    constructor(nGiro: number, pilota: Pilota, posizione: number, gara: Gara, tempo?: Tempo) {
-        this.nGiro = nGiro;
-        this.pilota = pilota;
-        this.posizione = posizione;
-        this.gara = gara;
-        this.tempo = tempo;
+        //Riformattazione dell'oggetto se possibile
+        if (tempo.ore === 0) {
+            tempo.ore = undefined;
+            if (tempo.minuti === 0) {
+                tempo.minuti = undefined;
+            }
+        }
+
+        return tempo;
+    }
+
+    /**
+     * Costruisce una stringa in formato [ore:minuti:secondi.millesimi] (2:17:49.5), escludendo i valori nulli
+     * @returns Oggetto Tempo in formato stringa
+     */
+    toString(): string {
+        let tempo: string = "";
+        if (this.ore) {
+            tempo += this.ore + ":";
+        }
+        if (this.minuti) {
+            tempo += this.minuti + ":";
+        }
+        tempo += this.secondi + "." + this.millisecondi;
+        return tempo;
     }
 }

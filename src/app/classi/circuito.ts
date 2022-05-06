@@ -1,6 +1,4 @@
-import { ApiService } from "../servizi/api.service";
 import { Gara } from "./gara";
-import { Stagione } from "./stagione";
 
 export class Circuito {
 

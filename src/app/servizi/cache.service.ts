@@ -8,6 +8,12 @@ import { Stagione } from '../classi/stagione';
   providedIn: 'root'
 })
 export class CacheService {
+  constructor() {
+    this.stagioni = new Map<number, Stagione>();
+    this.piloti = new Map<string, Pilota>();
+    this.costruttori = new Map<string, Costruttore>();
+    this.circuiti = new Map<string, Circuito>();
+  }
 
   stagBool: boolean = false;
   pilBool: boolean = false;
@@ -18,11 +24,4 @@ export class CacheService {
   piloti: Map<string, Pilota>;
   costruttori: Map<string, Costruttore>;
   circuiti: Map<string, Circuito>;
-
-  constructor() {
-    this.stagioni = new Map<number, Stagione>();
-    this.piloti = new Map<string, Pilota>();
-    this.costruttori = new Map<string, Costruttore>();
-    this.circuiti = new Map<string, Circuito>();
-  }
 }
