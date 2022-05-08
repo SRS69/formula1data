@@ -77,6 +77,20 @@ export class StagioniService {
 
     return this.cache.stagioni.get(anno);
   }
+  /**
+   * Restituisce la stagione di F1 corrente
+   * @returns Stagione corrente
+   */
+  async getStagioneCorrente(): Promise<Stagione | undefined> {
+    //Richiesta API
+    const stagioneApi: any = await lastValueFrom(this.api.getDataF1Api(`https://ergast.com/api/f1/current/seasons.json`, 0));
+    
+    const stagione: Stagione = new Stagione(parseInt(stagioneApi.MRData.SeasonTable.Seasons[0].season));
+    //Aggiunta della stagione alla cache
+    this.cache.stagioni.set(stagione.anno, stagione);
+    
+    return this.cache.stagioni.get(stagione.anno);
+  }
 
 
   
@@ -125,7 +139,7 @@ export class StagioniService {
 
         //Link dell'immagine del circuito
         let immagine: string | undefined;
-        immagine = wikiData.query.pages[wikiData.query.pageids[0]].thumbnail.source;
+        immagine = wikiData.query.pages[wikiData.query.pageids[0]].thumbnail?.source;
         if (immagine === undefined)
           immagine = this.api.placeholder;
           
@@ -181,7 +195,7 @@ export class StagioniService {
 
         //Link dell'immagine del circuito
         let immagine: string | undefined;
-        immagine = wikiData.query.pages[wikiData.query.pageids[0]].thumbnail.source;
+        immagine = wikiData.query.pages[wikiData.query.pageids[0]].thumbnail?.source;
         if (immagine === undefined)
           immagine = this.api.placeholder;
           
@@ -232,6 +246,7 @@ export class StagioniService {
       //Faccio la richiesta API per ottenere la classifica
       const classificaPiloti: any = await lastValueFrom(this.api.getDataF1Api(`https://ergast.com/api/f1/${stagione.anno}/driverStandings.json`, offset));
       console.log(classificaPiloti);
+      stagione.nPiloti = classificaPiloti.MRData.total;
 
       //Inserisco le posizioni nella cache
       for (let i = 0; i < classificaPiloti.MRData.StandingsTable.StandingsLists[0]?.DriverStandings.length; i++) {
@@ -246,7 +261,7 @@ export class StagioniService {
 
           //Link dell'immagine del pilota
           let immagine: string | undefined;
-          immagine = wikiData.query.pages[wikiData.query.pageids[0]].thumbnail.source;
+          immagine = wikiData.query.pages[wikiData.query.pageids[0]].thumbnail?.source;
           if (immagine === undefined)
             immagine = this.api.placeholder;
 
@@ -328,6 +343,8 @@ export class StagioniService {
       const classificaCostruttori: any = await lastValueFrom(this.api.getDataF1Api(`https://ergast.com/api/f1/${stagione.anno}/constructorStandings.json`, offset));
       console.log(classificaCostruttori);
 
+      stagione.nCostruttori = classificaCostruttori.MRData.total;
+
       //Inserisco le posizioni nella cache
       for (let i = 0; i < classificaCostruttori.MRData.StandingsTable.StandingsLists[0]?.ConstructorStandings.length; i++) {
         const posizione: any = classificaCostruttori.MRData.StandingsTable.StandingsLists[0]?.ConstructorStandings[i];
@@ -341,7 +358,7 @@ export class StagioniService {
 
           //Link dell'immagine del costruttore
           let immagine: string | undefined;
-          immagine = wikiData.query.pages[wikiData.query.pageids[0]].thumbnail.source;
+          immagine = wikiData.query.pages[wikiData.query.pageids[0]].thumbnail?.source;
           if (immagine === undefined)
             immagine = this.api.placeholder;
 
@@ -415,7 +432,7 @@ export class StagioniService {
 
           //Link dell'immagine del pilota
           let immagine: string | undefined;
-          immagine = wikiData.query.pages[wikiData.query.pageids[0]].thumbnail.source;
+          immagine = wikiData.query.pages[wikiData.query.pageids[0]].thumbnail?.source;
           if (immagine === undefined)
             immagine = this.api.placeholder;
 
@@ -435,7 +452,7 @@ export class StagioniService {
 
           //Link dell'immagine del costruttore
           let immagine: string | undefined;
-          immagine = wikiData.query.pages[wikiData.query.pageids[0]].thumbnail.source;
+          immagine = wikiData.query.pages[wikiData.query.pageids[0]].thumbnail?.source;
           if (immagine === undefined)
             immagine = this.api.placeholder;
 

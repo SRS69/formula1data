@@ -15,10 +15,14 @@ export class Stagione {
         this.gareBool = false;
         this.classificaPilotiBool = false;
         this.classificaCostruttoriBool = false;
+        this.nPiloti = 0;
+        this.nCostruttori = 0;
     }
 
     classificaPilotiBool: boolean;
+    nPiloti: number;
     classificaCostruttoriBool: boolean;
+    nCostruttori: number;
 
     gareBool: boolean;
     gare: Map<number, Gara>;

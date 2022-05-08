@@ -10,11 +10,22 @@ import { StagioniService } from '../servizi/stagioni.service';
 export class StagioniComponent implements OnInit {
 
   selezione: Stagione | undefined;
+  stagioni: Stagione[] | undefined;
   constructor(private stagioniService: StagioniService) {
+    this.primoLoad();
+    this.loadTutteStagioni();
   }
 
-  async load() {
-    this.selezione = await this.stagioniService.completaStagione(2022);
+  private async primoLoad() {
+    this.selezione = await this.stagioniService.getStagioneCorrente();
+    if(this.selezione)
+      this.completaStagione(this.selezione.anno);
+  }
+  async completaStagione(anno: number) {
+    this.selezione = await this.stagioniService.completaStagione(anno);
+  }
+  async loadTutteStagioni() {
+    this.stagioni = await this.stagioniService.getTutteStagioni();
   }
 
   ngOnInit(): void {
