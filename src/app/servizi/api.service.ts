@@ -19,7 +19,7 @@ export class ApiService {
     */
     this.limit = 50;
     this.placeholder = "https://upload.wikimedia.org/wikipedia/commons/3/3f/Placeholder_view_vector.svg";
-    this.imageSize = 500;
+    this.imageSize =800;
   }
 
 
@@ -73,7 +73,8 @@ export class ApiService {
     let titoliPagine: string[] = new Array<string>();
     //Estrazione dei titoli
     vettoreUrls.forEach(url => {
-      titoliPagine.push(url.substring(decodeURI(url).lastIndexOf('/') + 1));
+      const decodedUrl: string = decodeURI(url)
+      titoliPagine.push(url.substring(decodedUrl.lastIndexOf('/') + 1));
     });
 
     return titoliPagine;
@@ -95,7 +96,7 @@ export class ApiService {
    */
   wikiFromTitleToId(titoloWiki: string, dataApiWiki: any): number {
     //Cerca se il titolo è stato normalizzato, e in caso lo aggiorna
-    if (dataApiWiki.query.normalized !== undefined) {
+    if (dataApiWiki.query.normalized) {
       for (let i = 0; i < dataApiWiki.query.normalized.length; i++) {
         if (dataApiWiki.query.normalized[i].from === titoloWiki) {
           titoloWiki = dataApiWiki.query.normalized[i].to;
@@ -104,7 +105,7 @@ export class ApiService {
       }
     }
     //Cerca se il titolo è stato reindirizzato, e in caso lo aggiorna
-    if (dataApiWiki.query.redirects !== undefined) {
+    if (dataApiWiki.query.redirects) {
       for (let i = 0; i < dataApiWiki.query.redirects.length; i++) {
         if (dataApiWiki.query.redirects[i].from === titoloWiki) {
           titoloWiki = dataApiWiki.query.redirects[i].to;
@@ -113,12 +114,12 @@ export class ApiService {
       }
     }
     //Cerca la pagina wiki con il titolo corrispondente a quello passato come parametro
-    dataApiWiki.query.pageids.forEach((paginaId: any) => {
+    for (let i = 0; i < dataApiWiki.query.pageids.length; i++) {
+      const paginaId: number = dataApiWiki.query.pageids[i];
       if (dataApiWiki.query.pages[paginaId].title === titoloWiki) {
-        //Restituisce l'id della pagina
         return paginaId;
       }
-    });
+    }
     return -1;
   }
 

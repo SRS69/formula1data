@@ -1,0 +1,41 @@
+<div class="mx-auto w-11/12 mb-6">
+    <div class="text-center">
+        <h1 class="text-2xl font-bold">Stagione {{selezione?.stagione?.anno}} - Round {{selezione?.round}}</h1>
+        <h2 class="text-xl font-semibold">{{selezione?.nome}}</h2>
+    </div>
+
+    <a routerLink="/circuito/{{selezione?.circuito?.id}}">sium</a>
+
+    <div class="border flex-auto xl:w-2/3 h-max">
+        <h2 class="text-center text-xl font-semibold mb-2">Classifica Piloti</h2>
+        <div class="overflow-x-auto overflow-y-auto">
+          <table class="table table-compact w-full text-center">
+            <thead>
+              <tr>
+                <th>Posizione</th>
+                <th>Pilota</th>
+                <th>Costruttore</th>
+                <th>Poiszione di partenza</th>
+                <th>Giri</th>
+                <th>Tempo</th>
+                <th>Punti</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="cursor-pointer hover" *ngFor="let posto of selezione?.classificaGara| keyvalue; let i = index" [ngClass]="{'active': i%2!==0}">
+                <td>{{posto.value.posizione}}</td>
+                <td>{{posto.value.pilota.nome + ' ' + posto.value.pilota.cognome}}</td>
+                <td>{{posto.value.costruttore.nome}}</td>
+                <td>{{posto.value.griglia}}</td>
+                <td>{{posto.value.giri}}</td>
+                <td>{{posto.value.tempo?.toString()}}</td>
+                <td>{{posto.value.punti}}</td>
+              </tr>
+            </tbody>
+            <ng-template #loadingTable>
+              <progress class="radial-progress animate-spin" style="--value:30;">Caricamento</progress>
+            </ng-template>
+          </table>
+        </div>
+      </div>
+</div>

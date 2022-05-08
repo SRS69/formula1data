@@ -1,14 +1,17 @@
-<div *ngIf="selezione?.anno; else loading" class="m-8 max-w-full w-11/12 flex flex-col">
+<div *ngIf="selezione?.anno; else loading" class="mb-8 max-w-screen-2xl w-11/12 flex flex-col mx-auto">
+
   <div class="self-center flex">
+    <div>
+    <h1 class="text-2xl text-center font-bold">Stagione</h1>
+  </div>
     <div class="btn-group">
-      <button class="btn">«</button>
-      <button class="btn text-2xl text-center font-bold">Stagione {{selezione?.anno}}</button>
-      <button class="btn">»</button>
+      <button class="btn" routerLink="/stagione/2019">«</button>
+      <input class="btn text-2xl text-center font-bold out-of-range:border-red-500 rounded-none" type="number" min="1950" max="{{getAnnoMaggiore()}}" step="1" value="{{getAnnoMaggiore()}}"/>
+      <button class="btn" routerLink="/stagione/2022">»</button>
     </div>
     <h1 class="text-2xl text-center font-bold"></h1>
   </div>
-
-  <div *ngIf="selezione?.classificaPilotiBool && selezione?.classificaCostruttori && selezione?.gareBool; else loading" class="max-w-full flex flex-col gap-8 mt-10">
+  <div *ngIf="selezione?.gareBool; else loading" class="max-w-full flex flex-col gap-8 mt-10">
 
     <div class="flex xl:flex-row flex-col gap-8 justify-center">
 
@@ -26,7 +29,7 @@
               </tr>
             </thead>
             <tbody>
-              <tr *ngFor="let posto of selezione?.classificaPiloti | keyvalue;">
+              <tr class="cursor-pointer hover" routerLink="/pilota/{{posto.value.pilota.id}}" *ngFor="let posto of selezione?.classificaPiloti | keyvalue; let i = index" [ngClass]="{'active': i%2!==0}">
                 <td>{{posto.value.posizione}}</td>
                 <td>{{posto.value.pilota.nome + ' ' + posto.value.pilota.cognome}}</td>
                 <td>{{posto.value.vittore}}</td>
@@ -40,6 +43,7 @@
           </table>
         </div>
       </div>
+
       <div class="border flex-auto xl:w-1/3 h-max">
         <h2 class="text-xl text-center font-semibold mb-2">Classifica Costruttori</h2>
         <div class="overflow-x-auto overflow-y-auto">
@@ -53,7 +57,7 @@
               </tr>
             </thead>
             <tbody>
-              <tr *ngFor="let posto of selezione?.classificaCostruttori | keyvalue;">
+              <tr class="cursor-pointer hover" routerLink="/costruttore/{{posto.value.costruttore.id}}" *ngFor="let posto of selezione?.classificaCostruttori | keyvalue">
                 <td>{{posto.value.posizione}}</td>
                 <td>{{posto.value.costruttore.nome}}</td>
                 <td>{{posto.value.vittore}}</td>
@@ -82,7 +86,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let gara of selezione?.gare | keyvalue">
+            <tr routerLink="/stagione/{{gara.value.stagione.anno}}/{{gara.value.round}}" *ngFor="let gara of selezione?.gare | keyvalue; let i = index" [ngClass]="{'active': i%2!==0}">
               <td>{{gara.value.round}}</td>
               <td>{{gara.value.nome}}</td>
               <td>{{gara.value.circuito.nome}}</td>

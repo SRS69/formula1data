@@ -1,0 +1,41 @@
+<div class="mx-auto w-11/12 mb-6 max-w-screen-2xl">
+    <div class="mb-6">
+        <h1 class="text-2xl text-center font-bold">{{circuitoSelezionato?.nome}}</h1>
+        <p class="text-center font-semibold">{{circuitoSelezionato?.localita}} ({{circuitoSelezionato?.paese}})
+        </p>
+    </div>
+    <div class="card xl:card-side bg-base-100 shadow-xl max-h-min">
+        <div class="card-body h-auto flex flex-col xl:flex-row gap-8 xl:max-h-[700px]">
+                <img [src]="circuitoSelezionato?.imgUrl" class="xl:w-1/2 object-contain" alt="circuito {{circuitoSelezionato?.nome}}">
+           
+            <div class="xl:w-1/2 w-full border">
+                <div>
+                    <h2 class="text-2xl text-center font-bold mb-2">Gare</h2>
+                </div>
+                <div class="overflow-x-auto max-h-full">
+                    <table class="table table-compact w-full text-center">
+                        <thead>
+                            <tr class="sticky top-0">
+                                <th>Stagione</th>
+                                <th>Round</th>
+                                <th>Nome</th>
+                                <th>Data</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr routerLink="/stagione/{{gara.value.stagione.anno}}/{{gara.value.round}}"
+                                class="cursor-pointer hover t"
+                                *ngFor="let gara of circuitoSelezionato?.vettoreStagioniGare| keyvalue; let i = index">
+                                <td>{{gara.value.stagione.anno}}</td>
+                                <td>{{gara.value.round}}</td>
+                                <td>{{gara.value.nome}}</td>
+
+                                <td>{{gara.value.data | date}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

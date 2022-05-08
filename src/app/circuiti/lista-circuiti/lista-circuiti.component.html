@@ -1,0 +1,23 @@
+<div *ngIf="mappaCiruciti" class="mx-auto w-11/12 mb-6">
+    <div>
+        <h1 class="text-2xl text-center font-bold">Circuiti di Formula 1</h1>
+    </div>
+    <div class="overflow-x-auto mt-10">
+        <table class="table table-compact w-full text-center">
+          <thead>
+            <tr>
+              <th>Nome</th>
+              <th>Paese</th> 
+              <th>Località</th> 
+            </tr>
+          </thead> 
+          <tbody>
+            <tr routerLink="/circuito/{{circuito.key}}" class="cursor-pointer hover" *ngFor="let circuito of mappaCiruciti | keyvalue; let i = index">
+              <td>{{circuito.value.nome}}</td> 
+              <td>{{circuito.value.paese}}</td> 
+              <td>{{circuito.value.localita}}</td> 
+            </tr>
+          </tbody> 
+        </table>
+      </div>
+</div>

@@ -15,18 +15,18 @@ export class StagioniService {
 
   constructor(private api: ApiService, private cache: CacheService) {
   }
-  
+
   /**
    * Carica tutte le stagioni in cache
    * @returns Array contenente le stagioni presenti in cache
    */
-  async getTutteStagioni(): Promise<Stagione[]> {
+  getTutteStagioni(): Map<number, Stagione> {
     if (!this.cache.stagBool)
-      await this.loadTutteStagioniRicorsivo(0);
+      this.loadTutteStagioniRicorsivo(0);
 
     //Restituisce le stagioni presenti in cache ordinate per anno
-    return Array.from(this.cache.stagioni.values()).sort((a, b) => b.anno - a.anno);
-
+    //return Array.from(this.cache.stagioni.values()).sort((a, b) => b.anno - a.anno);
+    return this.cache.stagioni;
   }
   /**
    * Metodo ricorsivo per caricare tutte le stagioni in cache
@@ -35,7 +35,8 @@ export class StagioniService {
   private async loadTutteStagioniRicorsivo(offset: number) {
     if (!this.cache.stagBool) {
       //Richiesta API per ottenere le stagioni di F1 presenti dopo l'offset
-      const stagioni: any = await lastValueFrom(this.api.getDataF1Api('https://ergast.com/api/f1/seasons.json', offset));
+      this.api.getDataF1Api('https://ergast.com/api/f1/seasons.json', offset).subscribe((stagioni: any) => {
+
       console.log(stagioni);
 
       //Inseriemento delle stagioni nella cache
@@ -45,13 +46,14 @@ export class StagioniService {
       }
 
       //Controllo se bisogna fare altre chiamate API (API funziona con un sistema di paging)
-      if (this.cache.stagioni.size < stagioni.MRData.total) {
-        await this.loadTutteStagioniRicorsivo(offset + stagioni.MRData.SeasonTable.Seasons.length);
+      if (this.cache.stagioni.size < stagioni.MRData.total && stagioni.MRData.SeasonTable.Seasons.length!=0) {
+        this.loadTutteStagioniRicorsivo(offset + stagioni.MRData.SeasonTable.Seasons.length);
       }
       //Aggiorno il booleano che indica che le stagioni sono tutte state caricate in cache
       else if (this.cache.stagioni.size == stagioni.MRData.total) {
         this.cache.stagBool = true;
       }
+    });
 
     }
 
@@ -84,16 +86,16 @@ export class StagioniService {
   async getStagioneCorrente(): Promise<Stagione | undefined> {
     //Richiesta API
     const stagioneApi: any = await lastValueFrom(this.api.getDataF1Api(`https://ergast.com/api/f1/current/seasons.json`, 0));
-    
+
     const stagione: Stagione = new Stagione(parseInt(stagioneApi.MRData.SeasonTable.Seasons[0].season));
     //Aggiunta della stagione alla cache
     this.cache.stagioni.set(stagione.anno, stagione);
-    
+
     return this.cache.stagioni.get(stagione.anno);
   }
 
 
-  
+
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   ///////////////////////////////////////////////////////////GARE////////////////////////////////////////////////////////////////
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -123,7 +125,9 @@ export class StagioniService {
    */
   private async loadGareStagioneRicorsivo(stagione: Stagione, offset: number) {
     //Richiesta API per ottenere le gare della stagione
-    const gare: any = await lastValueFrom(this.api.getDataF1Api(`https://ergast.com/api/f1/${stagione.anno}.json`, offset))
+    this.api.getDataF1Api(`https://ergast.com/api/f1/${stagione.anno}.json`, offset).subscribe(async (gare: any) => {
+
+    
     console.log(gare);
 
     //Inserimento delle gare nella cache
@@ -139,10 +143,10 @@ export class StagioniService {
 
         //Link dell'immagine del circuito
         let immagine: string | undefined;
-        immagine = wikiData.query.pages[wikiData.query.pageids[0]].thumbnail?.source;
+        immagine = wikiData.query.pages[wikiData.query.pageids[0]]?.thumbnail?.source;
         if (immagine === undefined)
           immagine = this.api.placeholder;
-          
+
         //Creazione del circuito
         circuito = new Circuito(gara.Circuit.circuitId, gara.Circuit.circuitName, immagine, gara.Circuit.Location.lat,
           gara.Circuit.Location.long, gara.Circuit.Location.locality, gara.Circuit.Location.country);
@@ -154,7 +158,7 @@ export class StagioniService {
       //Aggiunta della gara alla cache
       stagione.gare.set(parseInt(gara.round), new Gara(gara.raceName,
         parseInt(gara.round), new Date(gara.date + " " + gara.time), circuito, stagione));
-  }
+    }
 
     //Controllo se bisogna fare altre richieste API
     if (stagione.gare.size < gare.MRData.total) {
@@ -162,6 +166,7 @@ export class StagioniService {
     } else if (stagione.gare.size == gare.MRData.total) {
       stagione.gareBool = true;
     }
+  });
 
     console.warn(stagione);
   }
@@ -180,37 +185,38 @@ export class StagioniService {
     //Controllo se la gara è già in cache
     if (stagione.gare.has(round))
       return stagione.gare.get(round);
-    
+
     //Richiesta API per ottenere la gara
     const gara: any = await lastValueFrom(this.api.getDataF1Api(`https://ergast.com/api/f1/${stagione.anno}/${round}.json`, 0))
-    console.log(gara.RaceTable.Races[0]);
+    console.log(gara.MRData.RaceTable.Races[0]);
 
     //Prendo il circuito
-    let circuito: Circuito | undefined = this.cache.circuiti.get(gara.RaceTable.Races[0].Circuit.circuitId);
-      //Se non c'è lo estraggo e lo aggiungo alla cache
-      if (circuito === undefined) {
-        //Richiesta API wiki per ottenere l'immagine del circuito
-        const wikiData: any = await lastValueFrom(this.api.getDataWikipedia(this.api.estraiTitoliDaUrls([gara.RaceTable.Races[0].Circuit.url]), this.api.imageSize));
-        console.log(wikiData);
+    let circuito: Circuito | undefined = this.cache.circuiti.get(gara.MRData.RaceTable.Races[0].Circuit.circuitId);
+    //Se non c'è lo estraggo e lo aggiungo alla cache
+    if (circuito === undefined) {
+      //Richiesta API wiki per ottenere l'immagine del circuito
+      const wikiData: any = await lastValueFrom(this.api.getDataWikipedia(this.api.estraiTitoliDaUrls([gara.MRData.RaceTable.Races[0].Circuit.url]), this.api.imageSize));
+      console.log(wikiData);
 
-        //Link dell'immagine del circuito
-        let immagine: string | undefined;
-        immagine = wikiData.query.pages[wikiData.query.pageids[0]].thumbnail?.source;
-        if (immagine === undefined)
-          immagine = this.api.placeholder;
-          
-        //Creazione del circuito
-        circuito = new Circuito(gara.RaceTable.Races[0].Circuit.circuitId, gara.RaceTable.Races[0].Circuit.circuitName, immagine, gara.RaceTable.Races[0].Circuit.Location.lat,
-          gara.RaceTable.Races[0].Circuit.Location.long, gara.RaceTable.Races[0].Circuit.Location.locality, gara.RaceTable.Races[0].Circuit.Location.country);
+      //Link dell'immagine del circuito
+      let immagine: string | undefined;
+      immagine = wikiData.query.pages[wikiData.query.pageids[0]]?.thumbnail?.source;
+      if (immagine === undefined)
+        immagine = this.api.placeholder;
 
-        //Aggiunta del circuito alla cache
-        this.cache.circuiti.set(circuito.id, circuito);
-      }
+      //Creazione del circuito
+      circuito = new Circuito(gara.MRData.RaceTable.Races[0].Circuit.circuitId, gara.MRData.RaceTable.Races[0].Circuit.circuitName, immagine, gara.MRData.RaceTable.Races[0].Circuit.Location.lat,
+        gara.MRData.RaceTable.Races[0].Circuit.Location.long, gara.MRData.RaceTable.Races[0].Circuit.Location.locality, gara.MRData.RaceTable.Races[0].Circuit.Location.country);
 
-      //Aggiunta della gara alla cache
-      stagione.gare.set(parseInt(gara.RaceTable.Races[0].round), new Gara(gara.RaceTable.Races[0].raceName,
-        parseInt(gara.RaceTable.Races[0].round), new Date(gara.RaceTable.Races[0].date + " " + gara.RaceTable.Races[0].time), circuito, stagione));
+      //Aggiunta del circuito alla cache
+      this.cache.circuiti.set(circuito.id, circuito);
+    }
 
+    //Aggiunta della gara alla cache
+    stagione.gare.set(parseInt(gara.MRData.RaceTable.Races[0].round), new Gara(gara.MRData.RaceTable.Races[0].raceName,
+      parseInt(gara.MRData.RaceTable.Races[0].round), new Date(gara.MRData.RaceTable.Races[0].date + " " + gara.MRData.RaceTable.Races[0].time), circuito, stagione));
+
+      console.log(stagione)
     return stagione.gare.get(round);
   }
 
@@ -222,7 +228,7 @@ export class StagioniService {
    * @param anno Anno della stagione della classifica
    * @returns Array contenente la classifica dei piloti dell'anno richiesto
    */
-  async getClassificaPilotiStagione(anno: number): Promise<PostoClassificaPiloti[]> {
+  async getClassificaPilotiStagione(anno: number): Promise<Map<number, PostoClassificaPiloti>> {
     //Prendo la stagione
     const stagione: Stagione | undefined = await this.getStagione(anno);
     if (stagione === undefined)
@@ -230,11 +236,12 @@ export class StagioniService {
 
     //Prendo le classifiche
     if (!stagione.classificaPilotiBool) {
-      await this.loadClassificaPilotiStagioneRicorsivo(stagione, 0);
+      this.loadClassificaPilotiStagioneRicorsivo(stagione, 0);
     }
 
+    return stagione.classificaPiloti;
     //Restituisco le classifiche sotto forma di Array ordinato decrescentemente per punti
-    return Array.from(stagione.classificaPiloti.values()).sort((a: PostoClassificaPiloti, b: PostoClassificaPiloti) => b.punti - a.punti);
+    //return Array.from(stagione.classificaPiloti.values()).sort((a: PostoClassificaPiloti, b: PostoClassificaPiloti) => b.punti - a.punti);
   }
   /**
    * Metodo ricorsivo che carica la classifica dei piloti dell'anno richiesto in cache
@@ -244,68 +251,73 @@ export class StagioniService {
   private async loadClassificaPilotiStagioneRicorsivo(stagione: Stagione, offset: number) {
     if (!stagione.classificaPilotiBool) {
       //Faccio la richiesta API per ottenere la classifica
-      const classificaPiloti: any = await lastValueFrom(this.api.getDataF1Api(`https://ergast.com/api/f1/${stagione.anno}/driverStandings.json`, offset));
-      console.log(classificaPiloti);
-      stagione.nPiloti = classificaPiloti.MRData.total;
+      this.api.getDataF1Api(`https://ergast.com/api/f1/${stagione.anno}/driverStandings.json`, offset).subscribe((classificaPiloti: any) => {
+        console.log(classificaPiloti);
+        stagione.nPiloti = classificaPiloti.MRData.total;
 
-      //Inserisco le posizioni nella cache
-      for (let i = 0; i < classificaPiloti.MRData.StandingsTable.StandingsLists[0]?.DriverStandings.length; i++) {
-        const posizione: any = classificaPiloti.MRData.StandingsTable.StandingsLists[0]?.DriverStandings[i];
-        //Prendo il pilota
-        let pilota: Pilota | undefined = this.cache.piloti.get(posizione.Driver.driverId);
-        //Se non c'è lo estraggo e lo aggiungo alla cache
-        if (pilota === undefined) {
-          //Richiesta API wiki per ottenere l'immagine del pilota
-          const wikiData: any = await lastValueFrom(this.api.getDataWikipedia(this.api.estraiTitoliDaUrls([posizione.Driver.url]), this.api.imageSize));
-          console.log(wikiData);
+        //Inserisco le posizioni nella cache
+        classificaPiloti.MRData.StandingsTable.StandingsLists[0]?.DriverStandings.forEach(async (posizione: any) => {
+          
+        
+        //for (let i = 0; i < classificaPiloti.MRData.StandingsTable.StandingsLists[0]?.DriverStandings.length; i++) {
+          //const posizione: any = classificaPiloti.MRData.StandingsTable.StandingsLists[0]?.DriverStandings[i];
+          //Prendo il pilota
+          let pilota: Pilota | undefined = this.cache.piloti.get(posizione.Driver.driverId);
+          //Se non c'è lo estraggo e lo aggiungo alla cache
+          if (pilota === undefined) {
+            //Richiesta API wiki per ottenere l'immagine del pilota
+            const wikiData: any = await lastValueFrom(this.api.getDataWikipedia(this.api.estraiTitoliDaUrls([posizione.Driver.url]), this.api.imageSize));
+            console.log(wikiData);
 
-          //Link dell'immagine del pilota
-          let immagine: string | undefined;
-          immagine = wikiData.query.pages[wikiData.query.pageids[0]].thumbnail?.source;
-          if (immagine === undefined)
-            immagine = this.api.placeholder;
+            //Link dell'immagine del pilota
+            let immagine: string | undefined;
+            immagine = wikiData.query.pages[wikiData.query.pageids[0]]?.thumbnail?.source;
+            if (immagine === undefined)
+              immagine = this.api.placeholder;
 
-          //Creazione del pilota
-          pilota = new Pilota(posizione.Driver.driverId, immagine, posizione.Driver.givenName, posizione.Driver.familyName,
-            new Date(posizione.Driver.deteOfBirth), posizione.Driver.nationality, posizione.Driver?.permanentNumber, posizione.Driver?.code);
+            //Creazione del pilota
+            pilota = new Pilota(posizione.Driver.driverId, immagine, posizione.Driver.givenName, posizione.Driver.familyName,
+              new Date(posizione.Driver.deteOfBirth), posizione.Driver.nationality, posizione.Driver?.permanentNumber, posizione.Driver?.code);
 
-          //Aggiunta del pilota alla cache
-          this.cache.piloti.set(pilota.id, pilota);
+            //Aggiunta del pilota alla cache
+            this.cache.piloti.set(pilota.id, pilota);
+          }
+
+          //Prendo il costruttore
+          let costruttore: Costruttore | undefined = this.cache.costruttori.get(posizione.Constructors[0].constructorId);
+          //Se non c'è lo estraggo e lo aggiungo alla cache
+          if (costruttore === undefined) {
+            //Richiesta API wiki per ottenere l'immagine del costruttore
+            const wikiData: any = await lastValueFrom(this.api.getDataWikipedia(this.api.estraiTitoliDaUrls([posizione.Constructors[0].url]), this.api.imageSize));
+            console.log(wikiData);
+
+            //Link dell'immagine del costruttore
+            let immagine: string | undefined;
+            immagine = wikiData.query?.pages[wikiData.query.pageids[0]]?.thumbnail?.source
+            if (immagine === undefined)
+              immagine = this.api.placeholder;
+
+            //Creazione del costruttore
+            costruttore = new Costruttore(posizione.Constructors[0].constructorId, posizione.Constructors[0].name, immagine,
+              posizione.Constructors[0].nationality);
+
+            //Aggiunta del costruttore alla cache
+            this.cache.costruttori.set(costruttore.id, costruttore);
+          }
+
+          //Aggiunta della posizione alla cache
+          stagione.classificaPiloti.set(parseInt(posizione.position),
+            new PostoClassificaPiloti(stagione, parseInt(posizione.position), parseInt(posizione.points),
+              parseInt(posizione.wins), costruttore, pilota));
+        //}
+      });
+        //Controllo se bisogna fare altre richieste API
+        if (stagione.classificaPiloti.size < classificaPiloti.MRData.total) {
+          this.loadClassificaPilotiStagioneRicorsivo(stagione, offset + classificaPiloti.MRData.StandingsTable.StandingsLists[0]?.DriverStandings.length)
+        } else if (stagione.classificaPiloti.size == classificaPiloti.MRData.total) {
+          stagione.classificaPilotiBool = true;
         }
-
-        //Prendo il costruttore
-        let costruttore: Costruttore | undefined = this.cache.costruttori.get(posizione.Constructors[0].constructorId);
-        //Se non c'è lo estraggo e lo aggiungo alla cache
-        if (costruttore === undefined) {
-          //Richiesta API wiki per ottenere l'immagine del costruttore
-          const wikiData: any = await lastValueFrom(this.api.getDataWikipedia(this.api.estraiTitoliDaUrls([posizione.Constructors[0].url]), this.api.imageSize));
-          console.log(wikiData);
-
-          //Link dell'immagine del costruttore
-          let immagine: string | undefined;
-          immagine = wikiData.query.pages[wikiData.query.pageids[0]].thumbnail?.source 
-          if (immagine === undefined)
-            immagine = this.api.placeholder;
-
-          //Creazione del costruttore
-          costruttore = new Costruttore(posizione.Constructors[0].constructorId, posizione.Constructors[0].name, immagine,
-            posizione.Constructors[0].nationality);
-
-          //Aggiunta del costruttore alla cache
-          this.cache.costruttori.set(costruttore.id, costruttore);
-        }
-
-        //Aggiunta della posizione alla cache
-        stagione.classificaPiloti.set(parseInt(posizione.position),
-          new PostoClassificaPiloti(stagione, parseInt(posizione.position), parseInt(posizione.points),
-            parseInt(posizione.wins), costruttore, pilota));
-      }
-      //Controllo se bisogna fare altre richieste API
-      if (stagione.classificaPiloti.size < classificaPiloti.MRData.total) {
-        await this.loadClassificaPilotiStagioneRicorsivo(stagione, offset + classificaPiloti.MRData.StandingsTable.StandingsLists[0]?.DriverStandings.length)
-      } else if (stagione.classificaPiloti.size == classificaPiloti.MRData.total) {
-        stagione.classificaPilotiBool = true;
-      }
+      });
     }
   }
 
@@ -317,7 +329,7 @@ export class StagioniService {
    * @param anno Anno della stagione della classifica
    * @returns Array contenente la classifica dei costruttori dell'anno richiesto
    */
-  async getClassificaCostruttoriStagione(anno: number): Promise<PostoClassificaCostruttori[]> {
+  async getClassificaCostruttoriStagione(anno: number): Promise<Map<number, PostoClassificaCostruttori>> {
     //Prendo la stagione
     const stagione: Stagione | undefined = await this.getStagione(anno);
     if (stagione === undefined)
@@ -325,12 +337,13 @@ export class StagioniService {
 
     //Prendo le classifiche
     if (!stagione.classificaCostruttoriBool) {
-      await this.loadClassificaCostruttoriStagioneRicorsivo(stagione, 0);
+      this.loadClassificaCostruttoriStagioneRicorsivo(stagione, 0);
     }
 
+    return stagione.classificaCostruttori
     //Restituisco le classifiche sotto forma di Array ordinato decrescentemente per punti
-    return Array.from(stagione.classificaCostruttori.values()).sort((
-      a: PostoClassificaCostruttori, b: PostoClassificaCostruttori) => b.punti - a.punti);
+    // return Array.from(stagione.classificaCostruttori.values()).sort((
+    //   a: PostoClassificaCostruttori, b: PostoClassificaCostruttori) => b.punti - a.punti);
   }
   /**
    * Metodo ricorsivo che carica la classifica dei costruttori dell'anno richiesto in cache
@@ -340,16 +353,21 @@ export class StagioniService {
   private async loadClassificaCostruttoriStagioneRicorsivo(stagione: Stagione, offset: number) {
     if (!stagione.classificaCostruttoriBool) {
       //Faccio la richiesta API per ottenere la classifica
-      const classificaCostruttori: any = await lastValueFrom(this.api.getDataF1Api(`https://ergast.com/api/f1/${stagione.anno}/constructorStandings.json`, offset));
+      this.api.getDataF1Api(`https://ergast.com/api/f1/${stagione.anno}/constructorStandings.json`, offset).subscribe((classificaCostruttori: any) => {
+
+      
       console.log(classificaCostruttori);
 
       stagione.nCostruttori = classificaCostruttori.MRData.total;
 
+      classificaCostruttori.MRData.StandingsTable.StandingsLists[0]?.ConstructorStandings.forEach(async (posizione: any) => {
+        
+      
       //Inserisco le posizioni nella cache
-      for (let i = 0; i < classificaCostruttori.MRData.StandingsTable.StandingsLists[0]?.ConstructorStandings.length; i++) {
-        const posizione: any = classificaCostruttori.MRData.StandingsTable.StandingsLists[0]?.ConstructorStandings[i];
+      //for (let i = 0; i < classificaCostruttori.MRData.StandingsTable.StandingsLists[0]?.ConstructorStandings.length; i++) {
+        //const posizione: any = classificaCostruttori.MRData.StandingsTable.StandingsLists[0]?.ConstructorStandings[i];
         //Prendo il costruttore
-        let costruttore: Costruttore | undefined = await this.cache.costruttori.get(posizione.Constructor.constructorId);
+        let costruttore: Costruttore | undefined = this.cache.costruttori.get(posizione.Constructor.constructorId);
         //Se non c'è lo estraggo e lo aggiungo alla cache
         if (costruttore === undefined) {
           //Richiesta API wiki per ottenere l'immagine del costruttore
@@ -358,7 +376,7 @@ export class StagioniService {
 
           //Link dell'immagine del costruttore
           let immagine: string | undefined;
-          immagine = wikiData.query.pages[wikiData.query.pageids[0]].thumbnail?.source;
+          immagine = wikiData.query.pages[wikiData.query.pageids[0]]?.thumbnail?.source;
           if (immagine === undefined)
             immagine = this.api.placeholder;
 
@@ -374,17 +392,19 @@ export class StagioniService {
         stagione.classificaCostruttori.set(parseInt(posizione.position),
           new PostoClassificaCostruttori(stagione, parseInt(posizione.position), parseInt(posizione.points),
             parseInt(posizione.wins), costruttore));
-    }
+      //}
+    });
 
       //Controllo se bisogna fare altre richieste API
       if (stagione.classificaCostruttori.size < classificaCostruttori.MRData.total) {
-        await this.loadClassificaCostruttoriStagioneRicorsivo(stagione, offset + classificaCostruttori.MRData.StandingsTable.StandingsLists[0].ConstructorStandings.length)
+        this.loadClassificaCostruttoriStagioneRicorsivo(stagione, offset + classificaCostruttori.MRData.StandingsTable.StandingsLists[0]?.ConstructorStandings.length)
       } else if (stagione.classificaCostruttori.size == classificaCostruttori.MRData.total) {
         stagione.classificaCostruttoriBool = true;
       }
+      });
     }
   }
-  
+
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   ///////////////////////////////////////////////////CLASSIFICA GARA/////////////////////////////////////////////////////////////
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -394,7 +414,7 @@ export class StagioniService {
    * @param round Round della gara
    * @returns Array contenente la classifica della gara richiesta
    */
-  async getClassificaGara(anno: number, round: number): Promise<PostoGara[]> {
+  async getClassificaGara(anno: number, round: number): Promise<Map<number, PostoGara>> {
     //Prendo la stagione
     const gara: Gara | undefined = await this.getGaraStagione(anno, round);
     if (gara === undefined)
@@ -402,11 +422,12 @@ export class StagioniService {
 
     //Prendo le classifiche
     if (!gara.classificaGaraBool) {
-      await this.loadClassificaGaraRicorsivo(gara, 0);
+      this.loadClassificaGaraRicorsivo(gara, 0);
     }
 
+    return gara.classificaGara;
     //Restituisco le classifiche sotto forma di Array ordinato decrescentemente per punti
-    return Array.from(gara.classificaGara.values()).sort((a: PostoGara, b: PostoGara) => b.punti - a.punti);
+    //return Array.from(gara.classificaGara.values()).sort((a: PostoGara, b: PostoGara) => b.punti - a.punti);
   }
   /**
    * Metodo ricorsivo che carica la classifica della gara richiesta in cache
@@ -416,12 +437,17 @@ export class StagioniService {
   private async loadClassificaGaraRicorsivo(gara: Gara, offset: number) {
     if (!gara.classificaGaraBool) {
       //Faccio la richiesta API per ottenere la classifica
-      const classificaGara: any = await lastValueFrom(this.api.getDataF1Api(`https://ergast.com/api/f1/${gara.stagione.anno}/${gara.round}/results.json`, offset));
+      this.api.getDataF1Api(`https://ergast.com/api/f1/${gara.stagione.anno}/${gara.round}/results.json`, offset).subscribe((classificaGara: any) => {
+        
+      
       console.log(classificaGara);
 
       //Inserisco le posizioni nella cache
-      for (let i = 0; i < classificaGara.MRData.RaceTable.Races[0]?.Results.length; i++) {
-        const posizione: any = classificaGara.MRData.RaceTable.Races[0]?.Results[i];
+      classificaGara.MRData.RaceTable.Races[0]?.Results.forEach(async (posizione: any) => {
+        
+      
+      //for (let i = 0; i < classificaGara.MRData.RaceTable.Races[0]?.Results.length; i++) {
+        //const posizione: any = classificaGara.MRData.RaceTable.Races[0]?.Results[i];
         //Prendo il pilota
         let pilota: Pilota | undefined = this.cache.piloti.get(posizione.Driver.driverId);
         //Se non c'è lo estraggo e lo aggiungo alla cache
@@ -432,7 +458,7 @@ export class StagioniService {
 
           //Link dell'immagine del pilota
           let immagine: string | undefined;
-          immagine = wikiData.query.pages[wikiData.query.pageids[0]].thumbnail?.source;
+          immagine = wikiData.query.pages[wikiData.query.pageids[0]]?.thumbnail?.source;
           if (immagine === undefined)
             immagine = this.api.placeholder;
 
@@ -452,7 +478,7 @@ export class StagioniService {
 
           //Link dell'immagine del costruttore
           let immagine: string | undefined;
-          immagine = wikiData.query.pages[wikiData.query.pageids[0]].thumbnail?.source;
+          immagine = wikiData.query.pages[wikiData.query.pageids[0]]?.thumbnail?.source;
           if (immagine === undefined)
             immagine = this.api.placeholder;
 
@@ -465,20 +491,22 @@ export class StagioniService {
         }
 
         let tempo: Tempo | undefined;
-        posizione.Time?.millis ? tempo = new Tempo(posizione.Time.millis) : tempo = undefined;
+        posizione.Time?.millis ? tempo = Tempo.daMillisecondi(posizione.Time.millis) : tempo = undefined;
         //Aggiunta della poiszione alla cache
         gara.classificaGara.set(parseInt(posizione.position),
           new PostoGara(parseInt(posizione.position), pilota, costruttore, parseInt(posizione.laps),
             parseInt(posizione.grid), parseInt(posizione.points), (posizione.status == "Finished"),
             gara, tempo));
-    }
+      //}
+    });
 
       //Controllo se bisogna fare altre richieste API
       if (gara.classificaGara.size < classificaGara.MRData.total) {
-        await this.loadClassificaGaraRicorsivo(gara, offset + classificaGara.MRData.RaceTable.Races[0].Results.length);
+        this.loadClassificaGaraRicorsivo(gara, offset + classificaGara.MRData.RaceTable.Races[0]?.Results.length);
       } else if (gara.classificaGara.size == classificaGara.MRData.total) {
         gara.classificaGaraBool = true;
       }
+    });
 
     }
   }
