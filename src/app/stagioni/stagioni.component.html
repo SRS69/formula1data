@@ -6,7 +6,7 @@
   </div>
     <div class="btn-group">
       <button class="btn" routerLink="/stagione/2019">«</button>
-      <input class="btn text-2xl text-center font-bold out-of-range:border-red-500 rounded-none" type="number" min="1950" max="{{getAnnoMaggiore()}}" step="1" value="{{getAnnoMaggiore()}}"/>
+      <input class="btn text-2xl text-center font-bold out-of-range:border-red-500 rounded-none" type="number" min="1950" max="{{getAnnoMaggiore()}}" step="1" value="{{selezione?.anno}}"/>
       <button class="btn" routerLink="/stagione/2022">»</button>
     </div>
     <h1 class="text-2xl text-center font-bold"></h1>

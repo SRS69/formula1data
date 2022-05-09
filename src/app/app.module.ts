@@ -21,12 +21,13 @@ const ROTTE: Routes = [
   { path: 'stagione', component: StagioniComponent},
   { path: 'stagione/:id', component: StagioniComponent },
   { path: 'stagione/:id/:idg', component: GaraComponent },
-  //{ path: 'circuito', component: ListaCircuitiComponent },
+  { path: 'circuito', component: ListaCircuitiComponent },
   { path: 'circuito/:id', component: CircuitoComponent },
   { path: 'pilota', component: ListaPilotiComponent },
   { path: 'pilota/:id', component: PilotaComponent },
   { path: 'costruttore', component: ListaCostruttoriComponent },
   { path: 'costruttore/:id', component: CostruttoreComponent },
+  { path: '**', redirectTo: '' }
 ]
 @NgModule({
   declarations: [

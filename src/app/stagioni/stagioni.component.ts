@@ -12,19 +12,29 @@ export class StagioniComponent implements OnInit {
 
   selezione: Stagione | undefined;
   mappaStagioni: Map<number, Stagione> | undefined;
-  constructor(private stagioniService: StagioniService, private router: ActivatedRoute) {
-    console.log(this.router.snapshot.params);
+  constructor(private stagioniService: StagioniService, private activatedRoute: ActivatedRoute, private router: Router) {
   }
   ngOnInit(): void {
-    let anno = parseInt(this.router.snapshot.params['id']);
-    console.log(this.router.snapshot.params)
-    if(anno) {
-      this.selezioneStagione(anno);
-      this.mappaStagioni = this.stagioniService.getTutteStagioni();
+    this.mappaStagioni = this.stagioniService.getTutteStagioni();
+
+    this.activatedRoute.params.subscribe(routeParams => {
+      let anno = parseInt(routeParams['id']);
+      if(anno) 
+        this.selezionaStagione(anno);
+      else {
+        this.urlVuoto();
+      }
+    });
+  }
+
+  private async urlVuoto() {
+    let tmp: Stagione | undefined = await this.stagioniService.getStagioneCorrente();
+    if(tmp) {
+      this.router.navigateByUrl('/stagione/'+tmp.anno);
     }
-    else {
-      this.stagioneCorrente();
-    }
+  }
+  private async selezionaStagione(anno: number) {
+    this.selezione = await this.stagioniService.completaStagione(anno);
   }
 
   getAnnoMaggiore(): number {
@@ -39,20 +49,4 @@ export class StagioniComponent implements OnInit {
     }
     return (new Date(Date.now())).getFullYear();
   }
-
-  private async stagioneCorrente() {
-    this.selezione = await this.stagioniService.getStagioneCorrente();
-    if(this.selezione) {
-      this.completaStagione(this.selezione.anno);
-    }
-  }
-  private async selezioneStagione(anno: number) {
-    this.selezione = await this.stagioniService.getStagione(anno);
-    if(this.selezione)
-      this.completaStagione(this.selezione.anno);
-  }
-  private async completaStagione(anno: number) {
-    this.selezione = await this.stagioniService.completaStagione(anno);
-  }
-
 }
