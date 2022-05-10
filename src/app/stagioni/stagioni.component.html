@@ -5,9 +5,10 @@
     <h1 class="text-2xl text-center font-bold">Stagione</h1>
   </div>
     <div class="btn-group">
-      <button class="btn" routerLink="/stagione/2019">«</button>
-      <input class="btn text-2xl text-center font-bold out-of-range:border-red-500 rounded-none" type="number" min="1950" max="{{getAnnoMaggiore()}}" step="1" value="{{selezione?.anno}}"/>
-      <button class="btn" routerLink="/stagione/2022">»</button>
+      <button class="btn" *ngIf="!((selezione?.anno!-1) < 1950)" routerLink="/stagione/{{selezione?.anno!-1}}">«</button>
+      <input #annoInput class="btn text-2xl text-center font-bold out-of-range:border-red-500 rounded-none" type="number" min="1950" max="{{getAnnoMaggiore()}}" step="1" value="{{selezione?.anno}}"
+        routerLink="/stagione/{{annoInput.value}}"/>
+      <button class="btn" *ngIf="!(getAnnoMaggiore() < (selezione?.anno!+1))" routerLink="/stagione/{{selezione?.anno!+1}}">»</button>
     </div>
     <h1 class="text-2xl text-center font-bold"></h1>
   </div>
@@ -90,7 +91,10 @@
               <td>{{gara.value.round}}</td>
               <td>{{gara.value.nome}}</td>
               <td>{{gara.value.circuito.nome}}</td>
-              <td>{{gara.value.data | date}}</td>
+              <td *ngIf="gara.value.data.toString() != 'Invalid Date'; else dataVuota">{{gara.value.data | date}}</td>
+              <ng-template #dataVuota>
+                <td>N/A</td>
+              </ng-template>
             </tr>
           </tbody>
         </table>

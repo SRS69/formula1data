@@ -1,6 +1,9 @@
 import { HttpClient, HttpUrlEncodingCodec } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
+/**
+ * Classe che permette di fare chiamate HTTP a wikipedia e alla API di F1
+ */
 @Injectable({
   providedIn: 'root'
 })
@@ -19,7 +22,7 @@ export class ApiService {
     */
     this.limit = 50;
     this.placeholder = "https://upload.wikimedia.org/wikipedia/commons/3/3f/Placeholder_view_vector.svg";
-    this.imageSize =800;
+    this.imageSize = 800;
   }
 
 
@@ -43,7 +46,7 @@ export class ApiService {
    * @returns Dati richiesti (https://en.wikipedia.org/wiki/Special:ApiSandbox)
    */
   getDataWikipedia(titoliPagine: Array<string>, dimensioni: number) {
-    return this.http.get(`https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&indexpageids=1&redirects=1&prop=pageimages&piprop=thumbnail&pithumbsize=${dimensioni}&titles=${titoliPagine.join('%7C')}`);
+    return this.http.get(`https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&indexpageids=1&redirects=1&prop=pageimages&piprop=thumbnail&pithumbsize=${dimensioni}&titles=${(titoliPagine.join('%7C')).replace(/\s/g, '_')}`);
   }
 
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -72,11 +75,10 @@ export class ApiService {
     //Vettore contenente i titoli estratti dagli URLs
     let titoliPagine: string[] = new Array<string>();
     //Estrazione dei titoli
-    vettoreUrls.forEach(url => {
+    vettoreUrls.forEach((url: string) => {
       const decodedUrl: string = decodeURI(url)
-      titoliPagine.push(url.substring(decodedUrl.lastIndexOf('/') + 1));
+      titoliPagine.push(decodedUrl.substring(decodedUrl.lastIndexOf('/') + 1));
     });
-
     return titoliPagine;
   }
   /**

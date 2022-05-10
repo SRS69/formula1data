@@ -1,1 +1,21 @@
-<p>lista-costruttori works!</p>
+<div *ngIf="mappaCostruttori" class="mx-auto w-11/12 mb-6">
+    <div>
+        <h1 class="text-2xl text-center font-bold">Costruttori di Formula 1</h1>
+    </div>
+    <div class="overflow-x-auto mt-10">
+        <table class="table table-compact w-full text-center">
+          <thead>
+            <tr>
+              <th>Nome</th>
+              <th>Nazionalità</th>
+            </tr>
+          </thead> 
+          <tbody>
+            <tr routerLink="/costruttore/{{costruttore.key}}" class="cursor-pointer hover" *ngFor="let costruttore of mappaCostruttori | keyvalue; let i = index">
+              <td>{{costruttore.value.nome}}</td> 
+              <td>{{costruttore.value.nazionalita}}</td>
+            </tr>
+          </tbody> 
+        </table>
+      </div>
+</div>

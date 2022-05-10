@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Gara } from 'src/app/classi/gara';
+import { Stagione } from 'src/app/classi/stagione';
 import { StagioniService } from 'src/app/servizi/stagioni.service';
 
 @Component({
@@ -11,16 +12,32 @@ import { StagioniService } from 'src/app/servizi/stagioni.service';
 export class GaraComponent implements OnInit {
 
   selezione: Gara | undefined;
-  constructor(private stagioniService: StagioniService, private router: ActivatedRoute) { }
+  constructor(private stagioniService: StagioniService, private activatedRoute: ActivatedRoute, private router: Router) { }
 
   ngOnInit(): void {
-    let anno: number = parseInt(this.router.snapshot.params['id']);
-    let round: number = parseInt(this.router.snapshot.params['idg']);
-    if(anno && round) {
-      this.selezionaGara(anno, round);
-    }
+    this.activatedRoute.params.subscribe(routeParams => {
+      let anno = parseInt(routeParams['id']);
+      let round = parseInt(routeParams['idg']);
+      if(anno) {
+        if(round) {
+          this.selezionaGara(anno, round);
+        }
+        else {
+          this.router.navigateByUrl('/stagione/'+anno);
+        }
+      }
+      else {
+        this.urlVuoto();
+      }
+    });
   }
 
+  private async urlVuoto() {
+    let tmp: Stagione | undefined = await this.stagioniService.getStagioneCorrente();
+    if(tmp) {
+      this.router.navigateByUrl('/stagione/'+tmp.anno);
+    }
+  }
   private async selezionaGara(anno: number, round: number) {
     this.selezione = await this.stagioniService.getGaraStagione(anno, round);
     this.stagioniService.getClassificaGara(anno, round);

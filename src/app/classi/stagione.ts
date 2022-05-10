@@ -1,3 +1,4 @@
+import { MapNO } from "../servizi/cache.service";
 import { Costruttore } from "./costruttore";
 import { Gara } from "./gara";
 import { Pilota } from "./pilota";
@@ -8,9 +9,9 @@ export class Stagione {
     constructor(anno: number) {
         this.anno = anno;
 
-        this.gare = new Map<number, Gara>();
-        this.classificaPiloti = new Map<number, PostoClassificaPiloti>();
-        this.classificaCostruttori = new Map<number, PostoClassificaCostruttori>();
+        this.gare = new MapNO<number, Gara>();
+        this.classificaPiloti = new MapNO<number, PostoClassificaPiloti>();
+        this.classificaCostruttori = new MapNO<number, PostoClassificaCostruttori>();
 
         this.gareBool = false;
         this.classificaPilotiBool = false;
@@ -21,9 +22,9 @@ export class Stagione {
     classificaCostruttoriBool: boolean;
 
     gareBool: boolean;
-    gare: Map<number, Gara>;
-    classificaPiloti: Map<number, PostoClassificaPiloti>;
-    classificaCostruttori: Map<number, PostoClassificaCostruttori>;
+    gare: MapNO<number, Gara>;
+    classificaPiloti: MapNO<number, PostoClassificaPiloti>;
+    classificaCostruttori: MapNO<number, PostoClassificaCostruttori>;
 }
 
 

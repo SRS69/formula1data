@@ -1,4 +1,4 @@
-import { Gara } from "./gara";
+import { MapNO } from "../servizi/cache.service";
 import { Pilota } from "./pilota";
 import { PostoClassificaCostruttori, Stagione } from "./stagione";
 
@@ -15,18 +15,18 @@ export class Costruttore {
         this.nazionalita = nazionalita;
 
         this.pilotiBool = false;
-        this.piloti = new Array<Pilota>();
+        this.piloti = new Set<Pilota>();
         this.stagioniBool = false;
-        this.stagioniEGare = new Map<number, PostoClassificaCostruttori>();
+        this.stagioniEGare = new MapNO<number, PostoClassificaCostruttori>();
 
         this.stagioniVinte = 0;
     }
 
     pilotiBool: boolean;
-    piloti: Pilota[];
+    piloti: Set<Pilota>;
 
     stagioniVinte: number;
 
     stagioniBool: boolean;
-    stagioniEGare: Map<number, PostoClassificaCostruttori>;
+    stagioniEGare: MapNO<number, PostoClassificaCostruttori>;
 }

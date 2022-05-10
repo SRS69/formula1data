@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
+import { from } from 'rxjs';
 import { Circuito } from 'src/app/classi/circuito';
+import { MapNO } from 'src/app/servizi/cache.service';
 import { CircuitiService } from 'src/app/servizi/circuiti.service';
 
 @Component({
@@ -9,13 +11,12 @@ import { CircuitiService } from 'src/app/servizi/circuiti.service';
 })
 export class ListaCircuitiComponent implements OnInit {
 
-  mappaCiruciti: Map<string, Circuito>;
+  mappaCiruciti: MapNO<string, Circuito> | undefined;
   constructor(private circuitiService: CircuitiService) {
-    this.mappaCiruciti = this.circuitiService.getTuttiCircuiti();
-    console.log(this.mappaCiruciti);
   }
   ngOnInit(): void {
-    //this.mappaCiruciti = this.circuitiService.getTuttiCircuiti();
+    this.mappaCiruciti = this.circuitiService.getTuttiCircuiti();
+    console.log(this.mappaCiruciti);
   }
 
 }

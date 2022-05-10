@@ -4,8 +4,11 @@ import { Circuito } from '../classi/circuito';
 import { Gara } from '../classi/gara';
 import { Stagione } from '../classi/stagione';
 import { ApiService } from './api.service';
-import { CacheService } from './cache.service';
+import { CacheService, MapNO } from './cache.service';
 
+/**
+ * Servizio per richiedere i dati riguardanti i circuiti di F1
+ */
 @Injectable({
   providedIn: 'root'
 })
@@ -15,13 +18,13 @@ export class CircuitiService {
 
   /**
    * Carica tutti i circuiti in cache
+   * @returns Mappa conetenente tutti i circuiti
    */
-  getTuttiCircuiti(): Map<string, Circuito> {
+  getTuttiCircuiti(): MapNO<string, Circuito> {
     if (!this.cache.circBool)
       this.loadTuttiCircuitiRicorsivo(0);
 
     return this.cache.circuiti;
-    //return Array.from(this.cache.circuiti.values());
   }
   /**
    * Metodo ricorsivo per caricare tutti i circuiti in cache
@@ -40,32 +43,22 @@ export class CircuitiService {
 
           //Inserimento dei circuiti nella cache
           circuiti.MRData.CircuitTable.Circuits.forEach((circuito: any) => {
-
-
-            //for (let i = 0; i < circuiti.MRData.CircuitTable.Circuits.length; i++) {
-            //  const circuito: any = circuiti.MRData.CircuitTable?.Circuits[i];
-
-
-            //circuiti.MRData.CircuitTable?.Circuits.forEach((circuito: any) => {
-            //Link dell'immagine del circuito
-            if(circuito.circuitId == "monza")
-              console.log("sus");
-            const idPagina: number = this.api.wikiFromTitleToId(this.api.estraiTitoliDaUrls([circuito.url])[0], wikiData);
-            let immagine: string | undefined = wikiData.query.pages[idPagina]?.thumbnail?.source;
-            //immagine = wikiData.query.pages[wikiData.query.pageids[this.api.wikiFromTitleToId(this.api.estraiTitoliDaUrls([circuito.url])[0], wikiData)]]?.thumbnail?.source;
-            if (immagine === undefined)
-              immagine = this.api.placeholder;
-
-            //Aggiunta del circuito alla cache
-            this.cache.circuiti.set(circuito.circuitId, new Circuito(circuito.circuitId, circuito.circuitName, immagine,
-              circuito.Location.lat, circuito.Location.long, circuito.Location.locality, circuito.Location.country));
+            if (!this.cache.circuiti.has(circuito.circuitId)) {
+              //Link dell'immagine del circuito
+              const idPagina: number = this.api.wikiFromTitleToId(this.api.estraiTitoliDaUrls([circuito.url])[0], wikiData);
+              let immagine: string | undefined = wikiData.query.pages[idPagina]?.thumbnail?.source;
+              if (immagine === undefined)
+                immagine = this.api.placeholder;
+              //Aggiunta del circuito alla cache
+              this.cache.circuiti.set(circuito.circuitId, new Circuito(circuito.circuitId, circuito.circuitName, immagine,
+                parseInt(circuito.Location.lat), parseInt(circuito.Location.long), circuito.Location.locality, circuito.Location.country));
+            }
           });
-          //}
 
           //Controllo se bisogna fare altre chiamate API
-          if (this.cache.circuiti.size < circuiti.MRData.total) {
-            this.loadTuttiCircuitiRicorsivo(offset + circuiti.MRData.CircuitTable?.Circuits.length);
-          } else if (this.cache.circuiti.size == circuiti.MRData.total) {
+          if (this.cache.circuiti.size < circuiti.MRData.total && circuiti.MRData.CircuitTable.Circuits.length > 0) {
+            this.loadTuttiCircuitiRicorsivo(offset + circuiti.MRData.CircuitTable.Circuits.length);
+          } else {
             this.cache.circBool = true;
           }
         });
@@ -77,9 +70,9 @@ export class CircuitiService {
   /**
    * Carica un singolo circuito in cache
    * @param id ID del circuito da caricare
+   * @returns Il circuito richiesto
    */
   async getCircuito(id: string): Promise<Circuito | undefined> {
-
     //Controllo se il circuito è già in cache
     if (this.cache.circuiti.has(id))
       return this.cache.circuiti.get(id);
@@ -91,7 +84,6 @@ export class CircuitiService {
     //Richiesta API wiki per ottenere l'immagine del circuito
     const wikiData: any = await lastValueFrom(this.api.getDataWikipedia(this.api.estraiTitoliDaUrls([circuito.MRData.CircuitTable.Circuits[0].url]), this.api.imageSize));
     console.log(wikiData);
-
     //Link dell'immagine del circuito
     let immagine: string | undefined;
     immagine = wikiData.query.pages[wikiData.query.pageids[0]]?.thumbnail?.source;
@@ -113,9 +105,9 @@ export class CircuitiService {
   /**
    * Carica tutte le gare di un circuito in cache
    * @param id ID del circuito
-   * @returns Array contenente tutte le gare fatte sul circuito
+   * @returns Mappa contenente tutte le gare fatte sul circuito
    */
-  async getGareCircuito(id: string): Promise<Map<number, Gara>> {
+  async getGareCircuito(id: string): Promise<MapNO<number, Gara>> {
     //Prendo il circuito
     const circuito: Circuito | undefined = await this.getCircuito(id);
     if (circuito === undefined)
@@ -126,9 +118,6 @@ export class CircuitiService {
       this.loadGareCircuitoRicorsivo(circuito, 0);
 
     return circuito.vettoreStagioniGare;
-    //restituisce le gare fatte sul circuito
-    // return Array.from(circuito.vettoreStagioniGare.values()).sort((
-    //   a: Gara, b: Gara) => b.stagione.anno - a.stagione.anno);;
   }
   /**
    * Metodo ricorsivo per caricare tutte le gare di un circuito in cache
@@ -144,17 +133,17 @@ export class CircuitiService {
         //Inserisco le gare nella cache
         gareCircuito.MRData.RaceTable.Races.forEach(async (garaData: any) => {
           //Prendo la stagione
-          let stagione: Stagione | undefined = this.cache.stagioni.get(garaData.season);
+          let stagione: Stagione | undefined = this.cache.stagioni.get(parseInt(garaData.season));
           //Se non è in cache lo aggiungo
           if (stagione === undefined) {
-            stagione = new Stagione(garaData.season);
+            stagione = new Stagione(parseInt(garaData.season));
             this.cache.stagioni.set(stagione.anno, stagione);
           }
           //Prendo la gara
-          let gara: Gara | undefined = stagione.gare.get(garaData.round);
+          let gara: Gara | undefined = stagione.gare.get(parseInt(garaData.round));
           //Se non è in cache la aggiungo
           if (gara === undefined) {
-            gara = new Gara(garaData.raceName, garaData.round, new Date(garaData.date), circuito, stagione);
+            gara = new Gara(garaData.raceName, parseInt(garaData.round), new Date(garaData.date), circuito, stagione);
             stagione.gare.set(gara.round, gara);
           }
 
@@ -163,7 +152,7 @@ export class CircuitiService {
         });
 
         //Controllo se devo fare altre richieste
-        if (circuito.vettoreStagioniGare.size < gareCircuito.MRData.total && gareCircuito.MRData.RaceTable.Races.length!=0) {
+        if (circuito.vettoreStagioniGare.size < gareCircuito.MRData.total && gareCircuito.MRData.RaceTable.Races.length != 0) {
           this.loadGareCircuitoRicorsivo(circuito, offset + gareCircuito.MRData.RaceTable.Races.length);
         } else if (circuito.vettoreStagioniGare.size == gareCircuito.MRData.total) {
           circuito.stagioniBool = true;
@@ -172,6 +161,11 @@ export class CircuitiService {
     }
   }
 
+  /**
+   * Completa il circuito richiesto
+   * @param id ID del circuito da completare
+   * @returns Circuito richiesto completato
+   */
   async completaCircuito(id: string): Promise<Circuito> {
     //Prendo il circuito
     const circuito: Circuito | undefined = await this.getCircuito(id);

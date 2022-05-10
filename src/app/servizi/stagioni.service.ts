@@ -6,7 +6,7 @@ import { Gara, PostoGara, Tempo } from '../classi/gara';
 import { Pilota } from '../classi/pilota';
 import { PostoClassificaCostruttori, PostoClassificaPiloti, Stagione } from '../classi/stagione';
 import { ApiService } from './api.service';
-import { CacheService } from './cache.service';
+import { CacheService, MapNO } from './cache.service';
 
 /**
  * Servizio per richiedere i dati riguardanti le stagioni e le gare di F1
@@ -23,7 +23,7 @@ export class StagioniService {
    * Carica tutte le stagioni in cache
    * @returns Mappa contenente le stagioni presenti in cache
    */
-  getTutteStagioni(): Map<number, Stagione> {
+  getTutteStagioni(): MapNO<number, Stagione> {
     //Controlla se bisogna caricare le stagioni in cache
     if (!this.cache.stagBool)
       this.loadTutteStagioniRicorsivo(0);
@@ -43,8 +43,7 @@ export class StagioniService {
 
         //Inseriemento delle stagioni nella cache
         stagioni.MRData.SeasonTable.Seasons.forEach((stagione: any) => {
-          if (!this.cache.stagioni.has(parseInt(stagione.season)))
-            this.cache.stagioni.set(parseInt(stagione.season), new Stagione(parseInt(stagione.season)));
+          this.cache.stagioni.set(parseInt(stagione.season), new Stagione(parseInt(stagione.season)));
         });
         //Controllo se bisogna fare altre chiamate API (API funziona con un sistema di paging)
         if (this.cache.stagioni.size < stagioni.MRData.total && stagioni.MRData.SeasonTable.Seasons.length > 0) {
@@ -72,8 +71,7 @@ export class StagioniService {
     console.log(stagione);
 
     //Aggiunta della stagione alla cache
-    if (!this.cache.stagioni.has(parseInt(stagione.season)))
-      this.cache.stagioni.set(parseInt(stagione.MRData.SeasonTable.Seasons[0].season), new Stagione(parseInt(stagione.MRData.SeasonTable.Seasons[0].season)));
+    this.cache.stagioni.set(parseInt(stagione.MRData.SeasonTable.Seasons[0].season), new Stagione(parseInt(stagione.MRData.SeasonTable.Seasons[0].season)));
 
     return this.cache.stagioni.get(anno);
   }
@@ -87,8 +85,7 @@ export class StagioniService {
 
     const stagione: Stagione = new Stagione(parseInt(stagioneApi.MRData.SeasonTable.Seasons[0].season));
     //Aggiunta della stagione alla cache
-    if (!this.cache.stagioni.has(stagione.anno))
-      this.cache.stagioni.set(stagione.anno, stagione);
+    this.cache.stagioni.set(stagione.anno, stagione);
 
     return this.cache.stagioni.get(stagione.anno);
   }
@@ -103,7 +100,7 @@ export class StagioniService {
    * @param anno Anno della stagione delle gare da caricare
    * @returns Mappa contenente le gare dell'anno richiesto
    */
-  async getGareStagione(anno: number): Promise<Map<number, Gara>> {
+  async getGareStagione(anno: number): Promise<MapNO<number, Gara>> {
     //Prendo la stagione
     const stagione: Stagione | undefined = await this.getStagione(anno);
     if (stagione === undefined)
@@ -121,7 +118,7 @@ export class StagioniService {
    * @param stagione Stagione di cui si vuole ottenere le gare
    * @param offset Scostamento dalla prima gara per la chiamata API
    */
-  private async loadGareStagioneRicorsivo(stagione: Stagione, offset: number) {
+  private loadGareStagioneRicorsivo(stagione: Stagione, offset: number) {
     if (!stagione.gareBool) {
       //Richiesta API per ottenere le gare della stagione
       this.api.getDataF1Api(`https://ergast.com/api/f1/${stagione.anno}.json`, offset).subscribe(async (gare: any) => {
@@ -147,16 +144,15 @@ export class StagioniService {
                 gara.Circuit.Location.long, gara.Circuit.Location.locality, gara.Circuit.Location.country);
 
               //Aggiunta del circuito alla cache
-              if (!this.cache.circuiti.has(circuito.id))
-                this.cache.circuiti.set(circuito.id, circuito);
+              this.cache.circuiti.set(circuito.id, circuito);
+
               circuito = this.cache.circuiti.get(circuito.id);
               if (!circuito)
                 throw new Error('Errore nel caricamento del circuito');
             }
-            if (!stagione.gare.has(parseInt(gara.raceId)))
-              //Aggiunta della gara alla cache
-              stagione.gare.set(parseInt(gara.round), new Gara(gara.raceName,
-                parseInt(gara.round), new Date(gara.date + " " + gara.time), circuito, stagione));
+            //Aggiunta della gara alla cache
+            stagione.gare.set(parseInt(gara.round), new Gara(gara.raceName,
+              parseInt(gara.round), new Date(gara.date + " " + gara.time), circuito, stagione));
           }
         });
 
@@ -207,16 +203,14 @@ export class StagioniService {
         gara.MRData.RaceTable.Races[0].Circuit.Location.long, gara.MRData.RaceTable.Races[0].Circuit.Location.locality, gara.MRData.RaceTable.Races[0].Circuit.Location.country);
 
       //Aggiunta del circuito alla cache
-      if (!this.cache.circuiti.has(circuito.id))
-        this.cache.circuiti.set(circuito.id, circuito);
+      this.cache.circuiti.set(circuito.id, circuito);
       circuito = this.cache.circuiti.get(circuito.id);
       if (!circuito)
         throw new Error('Errore nel caricamento del circuito');
     }
     //Aggiunta della gara alla cache
-    if (!stagione.gare.has(round))
-      stagione.gare.set(parseInt(gara.MRData.RaceTable.Races[0].round), new Gara(gara.MRData.RaceTable.Races[0].raceName,
-        parseInt(gara.MRData.RaceTable.Races[0].round), new Date(gara.MRData.RaceTable.Races[0].date + " " + gara.MRData.RaceTable.Races[0].time), circuito, stagione));
+    stagione.gare.set(parseInt(gara.MRData.RaceTable.Races[0].round), new Gara(gara.MRData.RaceTable.Races[0].raceName,
+      parseInt(gara.MRData.RaceTable.Races[0].round), new Date(gara.MRData.RaceTable.Races[0].date + " " + gara.MRData.RaceTable.Races[0].time), circuito, stagione));
 
     console.log(stagione)
     return stagione.gare.get(round);
@@ -231,7 +225,7 @@ export class StagioniService {
    * @param anno Anno della stagione della classifica
    * @returns Mappa contenente la classifica dei piloti dell'anno richiesto
    */
-  async getClassificaPilotiStagione(anno: number): Promise<Map<number, PostoClassificaPiloti>> {
+  async getClassificaPilotiStagione(anno: number): Promise<MapNO<number, PostoClassificaPiloti>> {
     //Prendo la stagione
     const stagione: Stagione | undefined = await this.getStagione(anno);
     if (stagione === undefined)
@@ -249,7 +243,7 @@ export class StagioniService {
    * @param stagione Stagione di cui si vuole la classifica
    * @param offset Scosatmento dalla prima posizione della classifica
    */
-  private async loadClassificaPilotiStagioneRicorsivo(stagione: Stagione, offset: number) {
+  private loadClassificaPilotiStagioneRicorsivo(stagione: Stagione, offset: number) {
     if (!stagione.classificaPilotiBool) {
       //Faccio la richiesta API per ottenere la classifica
       this.api.getDataF1Api(`https://ergast.com/api/f1/${stagione.anno}/driverStandings.json`, offset).subscribe((classificaPiloti: any) => {
@@ -273,8 +267,7 @@ export class StagioniService {
             pilota = new Pilota(posizione.Driver.driverId, immagine, posizione.Driver.givenName, posizione.Driver.familyName,
               new Date(posizione.Driver.deteOfBirth), posizione.Driver.nationality, posizione.Driver?.permanentNumber, posizione.Driver?.code);
             //Aggiunta del pilota alla cache
-            if (!this.cache.piloti.has(pilota.id))
-              this.cache.piloti.set(pilota.id, pilota);
+            this.cache.piloti.set(pilota.id, pilota);
             pilota = this.cache.piloti.get(pilota.id);
             if (!pilota)
               throw new Error('Errore nel caricamento del pilota');
@@ -296,18 +289,16 @@ export class StagioniService {
             costruttore = new Costruttore(posizione.Constructors[0].constructorId, posizione.Constructors[0].name, immagine,
               posizione.Constructors[0].nationality);
             //Aggiunta del costruttore alla cache
-            if (!this.cache.costruttori.has(costruttore.id))
-              this.cache.costruttori.set(costruttore.id, costruttore);
+            this.cache.costruttori.set(costruttore.id, costruttore);
             costruttore = this.cache.costruttori.get(costruttore.id);
             if (!costruttore)
               throw new Error('Errore nel caricamento del costruttore');
           }
 
           //Aggiunta della posizione alla cache
-          if (!stagione.classificaPiloti.has(parseInt(posizione.position)))
-            stagione.classificaPiloti.set(parseInt(posizione.position),
-              new PostoClassificaPiloti(stagione, parseInt(posizione.position), parseInt(posizione.points),
-                parseInt(posizione.wins), costruttore, pilota));
+          stagione.classificaPiloti.set(parseInt(posizione.position),
+            new PostoClassificaPiloti(stagione, parseInt(posizione.position), parseInt(posizione.points),
+              parseInt(posizione.wins), costruttore, pilota));
         });
         //Controllo se bisogna fare altre richieste API
         if (stagione.classificaPiloti.size < classificaPiloti.MRData.total && classificaPiloti.MRData.StandingsTable.StandingsLists[0]?.DriverStandings.length > 0) {
@@ -328,7 +319,7 @@ export class StagioniService {
    * @param anno Anno della stagione della classifica
    * @returns Mappa contenente la classifica dei costruttori dell'anno richiesto
    */
-  async getClassificaCostruttoriStagione(anno: number): Promise<Map<number, PostoClassificaCostruttori>> {
+  async getClassificaCostruttoriStagione(anno: number): Promise<MapNO<number, PostoClassificaCostruttori>> {
     //Prendo la stagione
     const stagione: Stagione | undefined = await this.getStagione(anno);
     if (stagione === undefined)
@@ -346,7 +337,7 @@ export class StagioniService {
    * @param stagione Stagione della classifica richiesta
    * @param offset Scosatmento dalla prima posizione della classifica
    */
-  private async loadClassificaCostruttoriStagioneRicorsivo(stagione: Stagione, offset: number) {
+  private loadClassificaCostruttoriStagioneRicorsivo(stagione: Stagione, offset: number) {
     if (!stagione.classificaCostruttoriBool) {
       //Faccio la richiesta API per ottenere la classifica
       this.api.getDataF1Api(`https://ergast.com/api/f1/${stagione.anno}/constructorStandings.json`, offset).subscribe((classificaCostruttori: any) => {
@@ -370,18 +361,16 @@ export class StagioniService {
             costruttore = new Costruttore(posizione.Constructor.constructorId, posizione.Constructor.name, immagine,
               posizione.Constructor.nationality)
             //Aggiunta del costruttore alla cache
-            if (!this.cache.costruttori.has(costruttore.id))
-              this.cache.costruttori.set(costruttore.id, costruttore);
+            this.cache.costruttori.set(costruttore.id, costruttore);
             costruttore = this.cache.costruttori.get(costruttore.id);
             if (!costruttore)
               throw new Error('Errore nel caricamento del costruttore');
           }
 
           //Aggiunta della poiszione alla cache
-          if (!stagione.classificaCostruttori.has(parseInt(posizione.position)))
-            stagione.classificaCostruttori.set(parseInt(posizione.position),
-              new PostoClassificaCostruttori(stagione, parseInt(posizione.position), parseInt(posizione.points),
-                parseInt(posizione.wins), costruttore));
+          stagione.classificaCostruttori.set(parseInt(posizione.position),
+            new PostoClassificaCostruttori(stagione, parseInt(posizione.position), parseInt(posizione.points),
+              parseInt(posizione.wins), costruttore));
         });
 
         //Controllo se bisogna fare altre richieste API
@@ -404,7 +393,7 @@ export class StagioniService {
    * @param round Round della gara
    * @returns Mappa contenente la classifica della gara richiesta
    */
-  async getClassificaGara(anno: number, round: number): Promise<Map<number, PostoGara>> {
+  async getClassificaGara(anno: number, round: number): Promise<MapNO<number, PostoGara>> {
     //Prendo la stagione
     const gara: Gara | undefined = await this.getGaraStagione(anno, round);
     if (gara === undefined)
@@ -422,7 +411,7 @@ export class StagioniService {
    * @param gara Gara di cui si vuole sapere la classifica
    * @param offset Scosatmento dalla prima posizione della classifica
    */
-  private async loadClassificaGaraRicorsivo(gara: Gara, offset: number) {
+  private loadClassificaGaraRicorsivo(gara: Gara, offset: number) {
     if (!gara.classificaGaraBool) {
       //Faccio la richiesta API per ottenere la classifica
       this.api.getDataF1Api(`https://ergast.com/api/f1/${gara.stagione.anno}/${gara.round}/results.json`, offset).subscribe((classificaGara: any) => {
@@ -446,8 +435,7 @@ export class StagioniService {
             pilota = new Pilota(posizione.Driver.driverId, immagine, posizione.Driver.givenName, posizione.Driver.familyName,
               new Date(posizione.Driver.dateOfBirth), posizione.Driver.nationality, posizione.driver?.permanentNumber, posizione.driver?.code);
             //Aggiunta del pilota alla cache
-            if (!this.cache.piloti.has(pilota.id))
-              this.cache.piloti.set(pilota.id, pilota);
+            this.cache.piloti.set(pilota.id, pilota);
             pilota = this.cache.piloti.get(pilota.id);
             if (!pilota)
               throw new Error('Errore nel caricamento del pilota');
@@ -468,8 +456,7 @@ export class StagioniService {
             costruttore = new Costruttore(posizione.Constructor.constructorId, posizione.Constructor.name, immagine,
               posizione.Constructor.nazionality);
             //Aggiunta del costruttore alla cache
-            if (!this.cache.costruttori.has(costruttore.id))
-              this.cache.costruttori.set(costruttore.id, costruttore);
+            this.cache.costruttori.set(costruttore.id, costruttore);
             costruttore = this.cache.costruttori.get(costruttore.id);
             if (!costruttore)
               throw new Error('Errore nel caricamento del costruttore');
@@ -478,11 +465,10 @@ export class StagioniService {
           let tempo: Tempo | undefined;
           posizione.Time?.millis ? tempo = Tempo.daMillisecondi(parseInt(posizione.Time.millis)) : tempo = undefined;
           //Aggiunta della poiszione alla cache
-          if (!gara.classificaGara.has(parseInt(posizione.position)))
-            gara.classificaGara.set(parseInt(posizione.position),
-              new PostoGara(parseInt(posizione.position), pilota, costruttore, parseInt(posizione.laps),
-                parseInt(posizione.grid), parseInt(posizione.points), (posizione.status == "Finished"),
-                gara, tempo));
+          gara.classificaGara.set(parseInt(posizione.position),
+            new PostoGara(parseInt(posizione.position), pilota, costruttore, parseInt(posizione.laps),
+              parseInt(posizione.grid), parseInt(posizione.points), (posizione.status == "Finished"),
+              gara, tempo));
         });
 
         //Controllo se bisogna fare altre richieste API
@@ -513,7 +499,7 @@ export class StagioniService {
     //Carico le classifiche della stagione
     this.getClassificaPilotiStagione(stagione.anno);
     this.getClassificaCostruttoriStagione(stagione.anno);
-    //Carico le classifice delle gare
+    //Carico le classifiche delle gare
     stagione.gare.forEach(gara => {
       this.getClassificaGara(stagione.anno, gara.round);
     });

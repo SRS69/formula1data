@@ -1,3 +1,4 @@
+import { MapNO } from "../servizi/cache.service";
 import { Gara } from "./gara";
 
 export class Circuito {
@@ -11,7 +12,7 @@ export class Circuito {
     paese: string;
 
     stagioniBool: boolean;
-    vettoreStagioniGare: Map<number, Gara> = new Map<number, Gara>();
+    vettoreStagioniGare: MapNO<number, Gara>;
 
 
     //constructor that can accept all parameters and use setters to validate them
@@ -26,6 +27,7 @@ export class Circuito {
         this.paese = paese;
 
         this.stagioniBool = false;
+        this.vettoreStagioniGare = new MapNO<number, Gara>();
     }
 
     //funcion that can only accept valid latitudine

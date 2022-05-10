@@ -1,18 +1,19 @@
 <div class="mx-auto w-11/12 mb-6 max-w-screen-2xl">
-    <div class="mb-6">
-        <h1 class="text-2xl text-center font-bold">{{circuitoSelezionato?.nome}}</h1>
-        <p class="text-center font-semibold">{{circuitoSelezionato?.localita}} ({{circuitoSelezionato?.paese}})
-        </p>
-    </div>
-    <div class="card xl:card-side bg-base-100 shadow-xl max-h-min">
-        <div class="card-body h-auto flex flex-col xl:flex-row gap-8 xl:max-h-[700px]">
-                <img [src]="circuitoSelezionato?.imgUrl" class="xl:w-1/2 object-contain" alt="circuito {{circuitoSelezionato?.nome}}">
+    <div class="card bg-base-100 shadow-xl max-h-min flex-col">
+        <div class="mb-6 p-2">
+            <h1 class="text-2xl text-center font-bold">{{circuitoSelezionato?.nome}}</h1>
+            <p class="text-center font-semibold">{{circuitoSelezionato?.localita}} ({{circuitoSelezionato?.paese}})
+            </p>
+        </div>
+        <div class="card-body h-auto flex flex-col xl:flex-row gap-8">
+                <img #immagine [src]="circuitoSelezionato?.imgUrl" class="xl:w-1/2 object-contain" alt="circuito {{circuitoSelezionato?.nome}}">
            
             <div class="xl:w-1/2 w-full border">
                 <div>
                     <h2 class="text-2xl text-center font-bold mb-2">Gare</h2>
                 </div>
-                <div class="overflow-x-auto max-h-full">
+                <!-- [ngStyle]="{'max-height.px': immagine.height}" -->
+                <div class="overflow-x-auto max-h-full xl:max-h-[500px]">
                     <table class="table table-compact w-full text-center">
                         <thead>
                             <tr class="sticky top-0">
