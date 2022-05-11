@@ -46,7 +46,8 @@ export class ApiService {
    * @returns Dati richiesti (https://en.wikipedia.org/wiki/Special:ApiSandbox)
    */
   getDataWikipedia(titoliPagine: Array<string>, dimensioni: number) {
-    return this.http.get(`https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&indexpageids=1&redirects=1&prop=pageimages&piprop=thumbnail&pithumbsize=${dimensioni}&titles=${(titoliPagine.join('%7C')).replace(/\s/g, '_')}`);
+    //https://en.wikipedia.org/w/index.php?title=Special:Redirect/file/
+    return this.http.get(`https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&indexpageids=1&redirects=1&imlimit=500&prop=pageimages%7Cimages&piprop=thumbnail&pithumbsize=${dimensioni}&pilicense=any&titles=${(titoliPagine.join('|'))}`);
   }
 
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -123,6 +124,25 @@ export class ApiService {
       }
     }
     return -1;
+  }
+
+  getImageUrlFromPage(page: any, searchInImages?: string): string {
+    //Controlla se c'è l'immagine "ufficiale" della pagina
+    if(page?.thumbnail?.source)
+      return page.thumbnail.source;
+
+    //Cicla tra le imamgini della pagina e usa il filtro di ricerca
+    if(page?.images && searchInImages) {
+      for(let i = 0; i < page.images.length; i++) {
+        const titolo: string = page.images[i].title;
+        if(titolo!="File:Commons-logo.svg" && 
+          titolo.toLowerCase().includes(searchInImages.toLowerCase())) {
+          return "https://en.wikipedia.org/w/index.php?title=Special:Redirect/file/"+page.images[i].title;
+        }
+      }
+    }
+
+    return this.placeholder;
   }
 
 }

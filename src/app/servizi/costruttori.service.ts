@@ -40,10 +40,7 @@ export class CostruttoriService {
         costruttori.MRData.ConstructorTable.Constructors.forEach((costruttore: any) => {
           if (!this.cache.costruttori.has(costruttore.constructorId)) {
             //Link dell'immagine del costruttore
-            let immagine: string | undefined;
-            immagine = wikiData.query.pages[wikiData.query.pageids[this.api.wikiFromTitleToId(this.api.estraiTitoliDaUrls([costruttore.url])[0], wikiData)]]?.thumbnail?.source;
-            if (immagine === undefined)
-              immagine = this.api.placeholder;
+            let immagine: string = this.api.getImageUrlFromPage(wikiData.query.pages[this.api.wikiFromTitleToId(this.api.estraiTitoliDaUrls([costruttore.url])[0], wikiData)], "logo");
             //Aggiunta del costruttore alla cache
             this.cache.costruttori.set(costruttore.constructorId,
               new Costruttore(costruttore.constructorId, costruttore.name, immagine, costruttore.nationality));
@@ -76,14 +73,11 @@ export class CostruttoriService {
 
     //Richiesta API per ottenere l'immagine del costruttore
     //const wikiData: any = await lastValueFrom(this.api.getDataWikipedia(this.api.estraiTitoliDaUrls([costruttore.MRData.ConstructorTable.Constructors[0].url]), this.api.imageSize));
-    const wikiData: any = await lastValueFrom(this.api.getDataWikipedia([costruttore.MRData.ConstructorTable.Constructors[0].name], this.api.imageSize))
+    const wikiData: any = await lastValueFrom(this.api.getDataWikipedia([costruttore.MRData.ConstructorTable.Constructors[0].url], this.api.imageSize))
     console.log(wikiData);
 
     //Link dell'immagine del costruttore
-    let immagine: string | undefined;
-    immagine = wikiData.query.pages[wikiData.query.pageids[0]]?.thumbnail?.source;
-    if (immagine === undefined)
-      immagine = this.api.placeholder;
+    let immagine: string = this.api.getImageUrlFromPage(wikiData.query.pages[wikiData.query.pageids[0]], "logo");
 
     //Aggiunta del costruttore alla cache
     this.cache.costruttori.set(costruttore.MRData.ConstructorTable.Constructors[0].constructorId,
@@ -130,10 +124,7 @@ export class CostruttoriService {
             const wikiData: any = await lastValueFrom(this.api.getDataWikipedia(this.api.estraiTitoliDaUrls([pilotaData.url]), this.api.imageSize));
             console.log(wikiData);
             //Link dell'immagine del pilota
-            let immagine: string | undefined;
-            immagine = wikiData.query.pages[wikiData.query.pageids[0]]?.thumbnail?.source;
-            if (immagine === undefined)
-              immagine = this.api.placeholder;
+            let immagine: string = this.api.getImageUrlFromPage(wikiData.query.pages[wikiData.query.pageids[0]], pilotaData.familyName);
             //Creazione del pilota
             pilota = new Pilota(pilotaData.driverId, immagine, pilotaData.givenName, pilotaData.familyName, new Date(pilotaData.dateOfBirth),
               pilotaData.nationality, pilotaData.permanentNumber, pilotaData.code);

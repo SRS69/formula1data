@@ -44,10 +44,7 @@ export class PilotiService {
           piloti.MRData.DriverTable.Drivers.forEach((pilota: any) => {
             if (!this.cache.piloti.has(pilota.driverId)) {
               //Link dell'immagine del pilota
-              let immagine: string | undefined;
-              immagine = wikiData.query.pages[wikiData.query.pageids[this.api.wikiFromTitleToId(this.api.estraiTitoliDaUrls([pilota.url])[0], wikiData)]]?.thumbnail?.source;
-              if (immagine === undefined)
-                immagine = this.api.placeholder;
+              let immagine: string = this.api.getImageUrlFromPage(wikiData.query.pages[this.api.wikiFromTitleToId(this.api.estraiTitoliDaUrls([pilota.url])[0], wikiData)], pilota.familyName);
               //Aggiunta del pilota alla cache
               this.cache.piloti.set(pilota.driverId,
                 new Pilota(pilota.driverId, immagine, pilota.givenName, pilota.familyName, new Date(pilota.dateOfBirth), pilota.nationality, pilota.permanentNumber, pilota.code));
@@ -84,15 +81,13 @@ export class PilotiService {
     console.log(wikiData);
 
     //Link dell'immagine del pilota
-    let immagine: string | undefined;
-    immagine = wikiData.query.pages[wikiData.query.pageids[0]]?.thumbnail?.source;
-    if (immagine === undefined)
-      immagine = this.api.placeholder;
+    let immagine: string = this.api.getImageUrlFromPage(wikiData.query.pages[wikiData.query.pageids[0]], pilota.MRData.DriverTable.Drivers[0].familyName);
 
     //Aggiunta del pilota alla cache
     this.cache.piloti.set(pilota.MRData.DriverTable.Drivers[0].driverId,
-      new Pilota(pilota.MRData.DriverTable.Drivers[0].driverId, immagine, pilota.MRData.DriverTable.Drivers[0].givenName, pilota.MRData.DriverTable.Drivers[0].familyName, new Date(pilota.MRData.DriverTable.Drivers[0].dateOfBirth),
-        pilota.MRData.DriverTable.Drivers[0].nationality, pilota.MRData.DriverTable.Drivers[0].permanentNumber, pilota.MRData.DriverTable.Drivers[0].code));
+      new Pilota(pilota.MRData.DriverTable.Drivers[0].driverId, immagine, pilota.MRData.DriverTable.Drivers[0].givenName, pilota.MRData.DriverTable.Drivers[0].familyName,
+        new Date(pilota.MRData.DriverTable.Drivers[0].dateOfBirth), pilota.MRData.DriverTable.Drivers[0].nationality,
+        pilota.MRData.DriverTable.Drivers[0].permanentNumber, pilota.MRData.DriverTable.Drivers[0].code));
 
     return this.cache.piloti.get(id);
   }
@@ -135,10 +130,7 @@ export class PilotiService {
             const wikiData: any = await lastValueFrom(this.api.getDataWikipedia(this.api.estraiTitoliDaUrls([costruttoreFromData.url]), this.api.imageSize));
             console.log(wikiData);
             //Link dell'immagine del costruttore
-            let immagine: string | undefined;
-            immagine = wikiData.query.pages[wikiData.query.pageids[0]]?.thumbnail?.source;
-            if (immagine === undefined)
-              immagine = this.api.placeholder;
+            let immagine: string = this.api.getImageUrlFromPage(wikiData.query.pages[wikiData.query.pageids[0]], "logo");
             //Creazione del costruttore
             costruttore = new Costruttore(costruttoreFromData.constructorId, costruttoreFromData.name, immagine, costruttoreFromData.nationality);
             //Aggiunta del costruttore alla cache
@@ -216,10 +208,7 @@ export class PilotiService {
               const wikiData: any = await lastValueFrom(this.api.getDataWikipedia(this.api.estraiTitoliDaUrls([posizione.DriverStandings[0].Constructors[0].url]), this.api.imageSize));
               console.log(wikiData);
               //Link dell'immagine del costruttore
-              let immagine: string | undefined;
-              immagine = wikiData.query.pages[wikiData.query.pageids[0]]?.thumbnail?.source;
-              if (immagine === undefined)
-                immagine = this.api.placeholder;
+              let immagine: string = this.api.getImageUrlFromPage(wikiData.query.pages[wikiData.query.pageids[0]], "logo");
               //Creazione del costruttore
               costruttore = new Costruttore(posizione.DriverStandings[0].Constructors[0].constructorId, posizione.DriverStandings[0].Constructors[0].name, immagine,
                 posizione.DriverStandings[0].Constructors[0].nationality);

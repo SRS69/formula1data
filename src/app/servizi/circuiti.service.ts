@@ -45,10 +45,7 @@ export class CircuitiService {
           circuiti.MRData.CircuitTable.Circuits.forEach((circuito: any) => {
             if (!this.cache.circuiti.has(circuito.circuitId)) {
               //Link dell'immagine del circuito
-              const idPagina: number = this.api.wikiFromTitleToId(this.api.estraiTitoliDaUrls([circuito.url])[0], wikiData);
-              let immagine: string | undefined = wikiData.query.pages[idPagina]?.thumbnail?.source;
-              if (immagine === undefined)
-                immagine = this.api.placeholder;
+              let immagine: string = this.api.getImageUrlFromPage(wikiData.query.pages[this.api.wikiFromTitleToId(this.api.estraiTitoliDaUrls([circuito.url])[0], wikiData)], "track");
               //Aggiunta del circuito alla cache
               this.cache.circuiti.set(circuito.circuitId, new Circuito(circuito.circuitId, circuito.circuitName, immagine,
                 parseInt(circuito.Location.lat), parseInt(circuito.Location.long), circuito.Location.locality, circuito.Location.country));
@@ -85,10 +82,7 @@ export class CircuitiService {
     const wikiData: any = await lastValueFrom(this.api.getDataWikipedia(this.api.estraiTitoliDaUrls([circuito.MRData.CircuitTable.Circuits[0].url]), this.api.imageSize));
     console.log(wikiData);
     //Link dell'immagine del circuito
-    let immagine: string | undefined;
-    immagine = wikiData.query.pages[wikiData.query.pageids[0]]?.thumbnail?.source;
-    if (immagine === undefined)
-      immagine = this.api.placeholder;
+    let immagine: string = this.api.getImageUrlFromPage(wikiData.query.pages[wikiData.query.pageids[0]], "track");
 
     const tmpCircuito: Circuito = new Circuito(circuito.MRData.CircuitTable.Circuits[0].circuitId,
       circuito.MRData.CircuitTable.Circuits[0].circuitName, immagine, circuito.MRData.CircuitTable.Circuits[0].Location.lat,
