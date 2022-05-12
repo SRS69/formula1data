@@ -136,7 +136,7 @@ export class StagioniService {
               console.log(wikiData);
               //Link dell'immagine del circuito
               let immagine: string = this.api.getImageUrlFromPage(wikiData.query.pages[wikiData.query.pageids[0]], 
-                ((gara.Circuit.circuitId).replace("_", "&")+"&"+gara.Circuit.circuitName+"&"+gara.Circuit.Location.locality+"&"+gara.Circuit.Location.country).split("&"));
+                ((gara.Circuit.circuitId).replace("_", "&")+"&"+(gara.Circuit.circuitName+"&"+gara.Circuit.Location.locality+"&"+gara.Circuit.Location.country).replace(" ", "&")).split("&"));
               //Creazione del circuito
               circuito = new Circuito(gara.Circuit.circuitId, gara.Circuit.circuitName, immagine, gara.Circuit.Location.lat,
                 gara.Circuit.Location.long, gara.Circuit.Location.locality, gara.Circuit.Location.country);
@@ -193,7 +193,7 @@ export class StagioniService {
       console.log(wikiData);
       //Link dell'immagine del circuito
       let immagine: string = this.api.getImageUrlFromPage(wikiData.query.pages[wikiData.query.pageids[0]],
-        ((gara.MRData.RaceTable.Races[0].Circuit.circuitId).replace("_", "&")+"&"+gara.MRData.RaceTable.Races[0].Circuit.circuitName+"&"+gara.MRData.RaceTable.Races[0].Circuit.Location.locality+"&"+gara.MRData.RaceTable.Races[0].Circuit.Location.country).split("&"));
+        ((gara.MRData.RaceTable.Races[0].Circuit.circuitId).replace("_", "&")+"&"+(gara.MRData.RaceTable.Races[0].Circuit.circuitName+"&"+gara.MRData.RaceTable.Races[0].Circuit.Location.locality+"&"+gara.MRData.RaceTable.Races[0].Circuit.Location.country).replace(" ", "&")).split("&"));
       //Creazione del circuito
       circuito = new Circuito(gara.MRData.RaceTable.Races[0].Circuit.circuitId, gara.MRData.RaceTable.Races[0].Circuit.circuitName, immagine, gara.MRData.RaceTable.Races[0].Circuit.Location.lat,
         gara.MRData.RaceTable.Races[0].Circuit.Location.long, gara.MRData.RaceTable.Races[0].Circuit.Location.locality, gara.MRData.RaceTable.Races[0].Circuit.Location.country);

@@ -32,7 +32,7 @@ export class CostruttoriService {
     this.api.getDataF1Api('https://ergast.com/api/f1/constructors.json', offset).subscribe((costruttori: any) => {
       console.log(costruttori);
 
-      //Richiesta API wiki per ottenere le immagini di tutti i circuiti
+      //Richiesta API wiki per ottenere le immagini di tutti i costruttori
       this.api.getDataWikipedia(this.api.estraiTitoliDaVettoreGenerico(costruttori.MRData.ConstructorTable.Constructors), this.api.imageSize).subscribe((wikiData: any) => {
         console.log(wikiData);
 
