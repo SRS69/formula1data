@@ -132,10 +132,11 @@ export class StagioniService {
             //Se non c'è lo estraggo e lo aggiungo alla cache
             if (circuito === undefined) {
               //Richiesta API wiki per ottenere l'immagine del circuito
-              const wikiData: any = await lastValueFrom(this.api.getDataWikipedia(this.api.estraiTitoliDaUrls([gara.Circuit.url]), this.api.imageSize));
+              const wikiData: any = await lastValueFrom(this.api.getDataWikipedia(["List_of_Formula_One_circuits"], this.api.imageSize));
               console.log(wikiData);
               //Link dell'immagine del circuito
-              let immagine: string = this.api.getImageUrlFromPage(wikiData.query.pages[wikiData.query.pageids[0]], gara.Circuit.circuitId);
+              let immagine: string = this.api.getImageUrlFromPage(wikiData.query.pages[wikiData.query.pageids[0]], 
+                ((gara.Circuit.circuitId).replace("_", "&")+"&"+gara.Circuit.circuitName+"&"+gara.Circuit.Location.locality+"&"+gara.Circuit.Location.country).split("&"));
               //Creazione del circuito
               circuito = new Circuito(gara.Circuit.circuitId, gara.Circuit.circuitName, immagine, gara.Circuit.Location.lat,
                 gara.Circuit.Location.long, gara.Circuit.Location.locality, gara.Circuit.Location.country);
@@ -188,10 +189,11 @@ export class StagioniService {
     //Se non c'è lo estraggo e lo aggiungo alla cache
     if (circuito === undefined) {
       //Richiesta API wiki per ottenere l'immagine del circuito
-      const wikiData: any = await lastValueFrom(this.api.getDataWikipedia(this.api.estraiTitoliDaUrls([gara.MRData.RaceTable.Races[0].Circuit.url]), this.api.imageSize));
+      const wikiData: any = await lastValueFrom(this.api.getDataWikipedia(["List_of_Formula_One_circuits"], this.api.imageSize));
       console.log(wikiData);
       //Link dell'immagine del circuito
-      let immagine: string = this.api.getImageUrlFromPage(wikiData.query.pages[wikiData.query.pageids[0]], gara.MRData.RaceTable.Races[0].Circuit.circuitId);
+      let immagine: string = this.api.getImageUrlFromPage(wikiData.query.pages[wikiData.query.pageids[0]],
+        ((gara.MRData.RaceTable.Races[0].Circuit.circuitId).replace("_", "&")+"&"+gara.MRData.RaceTable.Races[0].Circuit.circuitName+"&"+gara.MRData.RaceTable.Races[0].Circuit.Location.locality+"&"+gara.MRData.RaceTable.Races[0].Circuit.Location.country).split("&"));
       //Creazione del circuito
       circuito = new Circuito(gara.MRData.RaceTable.Races[0].Circuit.circuitId, gara.MRData.RaceTable.Races[0].Circuit.circuitName, immagine, gara.MRData.RaceTable.Races[0].Circuit.Location.lat,
         gara.MRData.RaceTable.Races[0].Circuit.Location.long, gara.MRData.RaceTable.Races[0].Circuit.Location.locality, gara.MRData.RaceTable.Races[0].Circuit.Location.country);
@@ -253,7 +255,7 @@ export class StagioniService {
             const wikiData: any = await lastValueFrom(this.api.getDataWikipedia(this.api.estraiTitoliDaUrls([posizione.Driver.url]), this.api.imageSize));
             console.log(wikiData);
             //Link dell'immagine del pilota
-            let immagine: string = this.api.getImageUrlFromPage(wikiData.query.pages[wikiData.query.pageids[0]], posizione.Driver.familyName);
+            let immagine: string = this.api.getImageUrlFromPage(wikiData.query.pages[wikiData.query.pageids[0]], [posizione.Driver.familyName]);
             //Creazione del pilota
             pilota = new Pilota(posizione.Driver.driverId, immagine, posizione.Driver.givenName, posizione.Driver.familyName,
               new Date(posizione.Driver.dateOfBirth), posizione.Driver.nationality, posizione.Driver?.permanentNumber, posizione.Driver?.code);
@@ -272,7 +274,7 @@ export class StagioniService {
             const wikiData: any = await lastValueFrom(this.api.getDataWikipedia(this.api.estraiTitoliDaUrls([posizione.Constructors[0].url]), this.api.imageSize));
             console.log(wikiData);
             //Link dell'immagine del costruttore
-            let immagine: string = this.api.getImageUrlFromPage(wikiData.query?.pages[wikiData.query.pageids[0]], "logo");
+            let immagine: string = this.api.getImageUrlFromPage(wikiData.query?.pages[wikiData.query.pageids[0]], [posizione.Constructors[0].constructorId, "logo"]);
             //Creazione del costruttore
             costruttore = new Costruttore(posizione.Constructors[0].constructorId, posizione.Constructors[0].name, immagine,
               posizione.Constructors[0].nationality);
@@ -341,7 +343,7 @@ export class StagioniService {
             const wikiData: any = await lastValueFrom(this.api.getDataWikipedia(this.api.estraiTitoliDaUrls([posizione.Constructor.url]), this.api.imageSize));
             console.log(wikiData);
             //Link dell'immagine del costruttore
-            let immagine: string = this.api.getImageUrlFromPage(wikiData.query.pages[wikiData.query.pageids[0]], "logo");
+            let immagine: string = this.api.getImageUrlFromPage(wikiData.query.pages[wikiData.query.pageids[0]], [posizione.Constructor.constructorId, "logo"]);
             //Creazione del costruttore
             costruttore = new Costruttore(posizione.Constructor.constructorId, posizione.Constructor.name, immagine,
               posizione.Constructor.nationality)
@@ -412,7 +414,7 @@ export class StagioniService {
             const wikiData: any = await lastValueFrom(this.api.getDataWikipedia(this.api.estraiTitoliDaUrls([posizione.Driver.url]), this.api.imageSize));
             console.log(wikiData);
             //Link dell'immagine del pilota
-            let immagine: string = this.api.getImageUrlFromPage(wikiData.query.pages[wikiData.query.pageids[0]], posizione.Driver.familyName);
+            let immagine: string = this.api.getImageUrlFromPage(wikiData.query.pages[wikiData.query.pageids[0]], [posizione.Driver.familyName]);
             //Creazione del pilota
             pilota = new Pilota(posizione.Driver.driverId, immagine, posizione.Driver.givenName, posizione.Driver.familyName,
               new Date(posizione.Driver.dateOfBirth), posizione.Driver.nationality, posizione.driver?.permanentNumber, posizione.driver?.code);
@@ -430,7 +432,7 @@ export class StagioniService {
             const wikiData: any = await lastValueFrom(this.api.getDataWikipedia(this.api.estraiTitoliDaUrls([posizione.Constructor.url]), this.api.imageSize));
             console.log(wikiData);
             //Link dell'immagine del costruttore
-            let immagine: string = this.api.getImageUrlFromPage(wikiData.query.pages[wikiData.query.pageids[0]], "logo");
+            let immagine: string = this.api.getImageUrlFromPage(wikiData.query.pages[wikiData.query.pageids[0]], [posizione.Constructor.constructorId, "logo"]);
             //Creazione del costruttore
             costruttore = new Costruttore(posizione.Constructor.constructorId, posizione.Constructor.name, immagine,
               posizione.Constructor.nazionality);

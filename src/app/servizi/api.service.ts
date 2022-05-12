@@ -126,23 +126,65 @@ export class ApiService {
     return -1;
   }
 
-  getImageUrlFromPage(page: any, searchInImages?: string): string {
+  
+  getImageUrlFromPage(page: any, searchInImages?: string[]): string {
     //Controlla se c'è l'immagine "ufficiale" della pagina
-    if(page?.thumbnail?.source)
-      return page.thumbnail.source;
+    if (page?.thumbnail?.source) {
+      if (searchInImages) {
+        for (let i = 0; i < searchInImages.length; i++) {
+          const titoloThumbnail: string = page.thumbnail.source;
+          if ((titoloThumbnail.toLowerCase()).includes(searchInImages[i].toLowerCase())) {
+            return page.thumbnail.source;
+          }
+        }
+      }
+      else
+        return page.thumbnail.source;
+    }
 
     //Cicla tra le imamgini della pagina e usa il filtro di ricerca
-    if(page?.images && searchInImages) {
-      for(let i = 0; i < page.images.length; i++) {
-        const titolo: string = page.images[i].title;
-        if(titolo!="File:Commons-logo.svg" && 
-          titolo.toLowerCase().includes(searchInImages.toLowerCase())) {
-          return "https://en.wikipedia.org/w/index.php?title=Special:Redirect/file/"+page.images[i].title;
-        }
+    if (page?.images && searchInImages) {
+      const indiceRisultato: number = this.risultatoPiuProbabile(page, searchInImages);
+      if (indiceRisultato !== -1) {
+        return "https://en.wikipedia.org/wiki/Special:Redirect?wptype=file&wpvalue=" + page.images[indiceRisultato].title + "&width=" + this.imageSize;
       }
     }
 
     return this.placeholder;
+  }
+
+  /**
+   * Confrontando tutti i filtri passati, restituisce l'indice del risultato più probabile
+   * @param page Pagina wiki
+   * @param filtri Parole da ricercare nell'immagine
+   * @returns Indice dell'immagine più probabile
+   */
+  private risultatoPiuProbabile(page: any, filtri: string[]): number {
+    //Iterate over the images of the page and, for each image, return the number of times a string from the searchInImages array is found in the image title
+    if(!page.images)
+      return -1;
+
+    let maxOc = 0; //Numero massime di occorrenze
+    let maxIndex = -1; //Indice dell'immagine con il numero massimo di occorrenze
+    //Cicla tra le imamgini della pagina
+    for (let i = 0; i < page.images.length; i++) {
+      const titolo: string = page.images[i].title;
+      if (titolo != "File:Commons-logo.svg") {
+        let oc = 0; //numero di occorrenze
+        //Ciclo per contare le occorrenze con i filtri
+        for (let j = 0; j < filtri.length; j++) {
+          if (titolo.toLowerCase().includes(filtri[j].toLowerCase())) {
+            oc++;
+          }
+        }
+        //Controllo se bisogna cambiare i massimi
+        if (oc > maxOc) {
+          maxOc = oc;
+          maxIndex = i;
+        }
+      }
+    }
+    return maxIndex;
   }
 
 }

@@ -40,7 +40,7 @@ export class CostruttoriService {
         costruttori.MRData.ConstructorTable.Constructors.forEach((costruttore: any) => {
           if (!this.cache.costruttori.has(costruttore.constructorId)) {
             //Link dell'immagine del costruttore
-            let immagine: string = this.api.getImageUrlFromPage(wikiData.query.pages[this.api.wikiFromTitleToId(this.api.estraiTitoliDaUrls([costruttore.url])[0], wikiData)], "logo");
+            let immagine: string = this.api.getImageUrlFromPage(wikiData.query.pages[this.api.wikiFromTitleToId(this.api.estraiTitoliDaUrls([costruttore.url])[0], wikiData)], [costruttore.constructorId, "logo"]);
             //Aggiunta del costruttore alla cache
             this.cache.costruttori.set(costruttore.constructorId,
               new Costruttore(costruttore.constructorId, costruttore.name, immagine, costruttore.nationality));
@@ -77,7 +77,7 @@ export class CostruttoriService {
     console.log(wikiData);
 
     //Link dell'immagine del costruttore
-    let immagine: string = this.api.getImageUrlFromPage(wikiData.query.pages[wikiData.query.pageids[0]], "logo");
+    let immagine: string = this.api.getImageUrlFromPage(wikiData.query.pages[wikiData.query.pageids[0]], [costruttore.MRData.ConstructorTable.Constructors[0].constructorId, "logo"]);
 
     //Aggiunta del costruttore alla cache
     this.cache.costruttori.set(costruttore.MRData.ConstructorTable.Constructors[0].constructorId,
@@ -124,7 +124,7 @@ export class CostruttoriService {
             const wikiData: any = await lastValueFrom(this.api.getDataWikipedia(this.api.estraiTitoliDaUrls([pilotaData.url]), this.api.imageSize));
             console.log(wikiData);
             //Link dell'immagine del pilota
-            let immagine: string = this.api.getImageUrlFromPage(wikiData.query.pages[wikiData.query.pageids[0]], pilotaData.familyName);
+            let immagine: string = this.api.getImageUrlFromPage(wikiData.query.pages[wikiData.query.pageids[0]], [pilotaData.familyName]);
             //Creazione del pilota
             pilota = new Pilota(pilotaData.driverId, immagine, pilotaData.givenName, pilotaData.familyName, new Date(pilotaData.dateOfBirth),
               pilotaData.nationality, pilotaData.permanentNumber, pilotaData.code);

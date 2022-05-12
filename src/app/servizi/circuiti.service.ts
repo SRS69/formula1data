@@ -38,14 +38,15 @@ export class CircuitiService {
 
         //Richiesta API wiki per ottenere le immagini dei circuiti
         const urls: string[] = this.api.estraiTitoliDaVettoreGenerico(circuiti.MRData.CircuitTable.Circuits);
-        this.api.getDataWikipedia(urls, this.api.imageSize).subscribe((wikiData: any) => {
+        this.api.getDataWikipedia(["List_of_Formula_One_circuits"], this.api.imageSize).subscribe((wikiData: any) => {
           console.log(wikiData);
 
           //Inserimento dei circuiti nella cache
           circuiti.MRData.CircuitTable.Circuits.forEach((circuito: any) => {
             if (!this.cache.circuiti.has(circuito.circuitId)) {
               //Link dell'immagine del circuito
-              let immagine: string = this.api.getImageUrlFromPage(wikiData.query.pages[this.api.wikiFromTitleToId(this.api.estraiTitoliDaUrls([circuito.url])[0], wikiData)], "track");
+              let immagine: string = this.api.getImageUrlFromPage(wikiData.query.pages[wikiData.query.pageids[0]],
+                ((circuito.circuitId).replace("_", "&")+"&"+circuito.circuitName+"&"+circuito.Location.locality+"&"+circuito.Location.country).split("&"));
               //Aggiunta del circuito alla cache
               this.cache.circuiti.set(circuito.circuitId, new Circuito(circuito.circuitId, circuito.circuitName, immagine,
                 parseInt(circuito.Location.lat), parseInt(circuito.Location.long), circuito.Location.locality, circuito.Location.country));
@@ -64,6 +65,7 @@ export class CircuitiService {
 
     console.warn(this.cache);
   }
+
   /**
    * Carica un singolo circuito in cache
    * @param id ID del circuito da caricare
@@ -82,7 +84,8 @@ export class CircuitiService {
     const wikiData: any = await lastValueFrom(this.api.getDataWikipedia(this.api.estraiTitoliDaUrls([circuito.MRData.CircuitTable.Circuits[0].url]), this.api.imageSize));
     console.log(wikiData);
     //Link dell'immagine del circuito
-    let immagine: string = this.api.getImageUrlFromPage(wikiData.query.pages[wikiData.query.pageids[0]], "track");
+    let immagine: string = this.api.getImageUrlFromPage(wikiData.query.pages[wikiData.query.pageids[0]],
+      ((circuito.MRData.CircuitTable.Circuits[0].circuitId).replace("_", "&")+"&"+circuito.MRData.CircuitTable.Circuits[0].circuitName+"&"+circuito.MRData.CircuitTable.Circuits[0].Location.locality+"&"+circuito.MRData.CircuitTable.Circuits[0].Location.country).split("&"));
 
     const tmpCircuito: Circuito = new Circuito(circuito.MRData.CircuitTable.Circuits[0].circuitId,
       circuito.MRData.CircuitTable.Circuits[0].circuitName, immagine, circuito.MRData.CircuitTable.Circuits[0].Location.lat,
