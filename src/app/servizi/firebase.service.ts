@@ -1,66 +1,35 @@
 import { Injectable } from '@angular/core';
-import { GoogleAuthProvider, UserCredential } from 'firebase/auth';
-
-
-import { AngularFireStorage } from "@angular/fire/compat/storage";
-
-import { initializeApp } from "firebase/app";
-import { getStorage, ref, listAll, getDownloadURL, uploadBytes } from "firebase/storage";
-import { HttpClient } from '@angular/common/http';
 
 import { AngularFireAuth } from '@angular/fire/compat/auth';
 import firebase from 'firebase/compat/app';
-import { AngularFirestore, AngularFirestoreDocument } from '@angular/fire/compat/firestore';
+import { AngularFirestore, AngularFirestoreDocument, DocumentReference } from '@angular/fire/compat/firestore';
 
 import { Observable, of } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 import { Router } from '@angular/router';
 
-import { doc, updateDoc, arrayUnion, arrayRemove } from "firebase/firestore";
-
-
-// Info di Firebase
-const firebaseConfig = {
-  apiKey: "AIzaSyDUHMLiX2sugAagg8skcI9rMKwaijsYXQ0",
-  authDomain: "formula1data-28da4.firebaseapp.com",
-  projectId: "formula1data-28da4",
-  storageBucket: "formula1data-28da4.appspot.com",
-  messagingSenderId: "1087560955797",
-  appId: "1:1087560955797:web:4ce3ff3bb4c29ab26c689c",
-  measurementId: "G-FPKYF7YJZ9"
-};
-
-const firebaseApp = initializeApp(firebaseConfig);
-
-// Collegamento al bucket di Firebase Storage
-const storage = getStorage(firebaseApp);
-// Lista di ogni utente presente su Firebase
-const listUsersRef = ref(storage);
+import { updateDoc, arrayUnion, arrayRemove } from "firebase/firestore";
 
 export interface Utente {
   uid: string;
-  email: string;
-  photoURL: string;
-  displayName: string;
-  favourites: string[];
+  email: string | null;
+  photoURL: string | null;
+  displayName: string | null;
+  favourites: string[] | null;
 }
 
 @Injectable({
   providedIn: 'root'
 })
 export class FirebaseService {
-  //Record del Database
+  //Record dell'utente (aggiornato) nel database
   utente: Observable<Utente | null | undefined>;
 
-
-  preferiti: string[] | undefined;
-
-  isLogged: boolean = false;
   constructor(public afAuth: AngularFireAuth, private afirestore: AngularFirestore, private router: Router) {
-
-    //Quando è loggato carica il record dell'utente
+    //Assegna il valore al record di utente corrente se è loggato
     this.utente = this.afAuth.authState.pipe(
       switchMap(user => {
+        //Se è loggato restituisce il record dell'utente
         if (user) {
           return this.afirestore.doc<Utente>(`users/${user.uid}`).valueChanges();
         } else {
@@ -70,45 +39,119 @@ export class FirebaseService {
     );
   }
 
+  /**
+   * Fa il login con google
+   */
   async googleSignin() {
     const provider = new firebase.auth.GoogleAuthProvider();
     const credential = await this.afAuth.signInWithPopup(provider);
-    //return this.updateUserData(credential.user);
+    this.inizializzaUtente(credential.user);
   }
+  /**
+   * Esegue il logout
+   */
   async signOut() {
     await this.afAuth.signOut();
   }
 
-  loadUtente() {
+  /**
+   * Inizializza un utente
+   * @param user Utente loggato
+   */
+  private async inizializzaUtente(user: firebase.User | null) {
+    if (user == null)
+      throw new Error("Utente non loggato");
 
-  }
+    //Prendo il documento dell'utente
+    const documentoUtente: AngularFirestoreDocument<Utente> = this.afirestore.doc(`users/${user.uid}`);
 
-  private updateUserData(user: any) {
-    const userRef: AngularFirestoreDocument<Utente> = this.afirestore.doc(`users/${user.uid}`);
+    //Prendo l'utente correntemente caricato nel database
+    let utenteCorrente: Utente | undefined;
+    await documentoUtente.ref.get().then(snapshot => utenteCorrente = snapshot.data());
+    console.log(utenteCorrente);
 
-    const data: Utente = {
+    //Prendo i favoriti dell'utente corentemente caricato
+    let favoritiUtenteCorrente: string[];
+    if (utenteCorrente && utenteCorrente.favourites) {
+      favoritiUtenteCorrente = utenteCorrente.favourites;
+    } else {
+      favoritiUtenteCorrente = [];
+    }
+
+    //Metto le informazioni dell'utente in un oggetto
+    const utente: Utente = {
       uid: user.uid,
       email: user.email,
       displayName: user.displayName,
-      photoURL: user.photoURL,
-      favourites: []
+      photoURL: user.photoURL ? user.photoURL : "https://c.tenor.com/EBbGfZGzWbIAAAAC/ben-talking-ben.gif",
+      favourites: favoritiUtenteCorrente
     };
 
-    return userRef.set(data, { merge: true });
+    //Carico le informazioni dell'utente nel database
+    documentoUtente.set(utente, { merge: true });
   }
-  private addFavourite(user: any) {
-    const userRef: AngularFirestoreDocument<Utente> = this.afirestore.doc(`users/${user.uid}`);
-    //const userRef = doc(db, "cities", "DC");
-    let preferiti: string[] = [];
 
-    userRef.ref.update({
-      favourites: firebase.firestore.FieldValue.arrayUnion(this.preferiti)
-    });
+  /**
+   * Aggiunge la rotta corrente alla lista dei preferiti
+   */
+  async addFavourite() {
+    //Prendo l'utente attualmente loggato
+    const utenteCorrente: firebase.User | null = await this.afAuth.currentUser;
+    if(utenteCorrente == null)
+      throw new Error("Utente non loggato");
 
-    userRef.update({
+    //Prendo il suo documento
+    const documentoUtente: AngularFirestoreDocument<Utente> = this.afirestore.doc(`users/${utenteCorrente.uid}`);
+    const refDocUtente: DocumentReference<Utente> = documentoUtente.ref;
 
+    //Aggiungo il preferito
+    await updateDoc(refDocUtente, {
+      favourites: arrayUnion(this.router.url)
     });
   }
-  removeFavourite() {}
+  /**
+   * Rimuove la rotta corrente dalla lista dei preferiti
+   */
+  async removeFavourite() {
+    //Prendo l'utente attualmente loggato
+    const utenteCorrente: firebase.User | null = await this.afAuth.currentUser;
+    if(utenteCorrente == null)
+      throw new Error("Utente non loggato");
+
+    //Prendo il suo documento
+    const documentoUtente: AngularFirestoreDocument<Utente> = this.afirestore.doc(`users/${utenteCorrente.uid}`);
+    const refDocUtente: DocumentReference<Utente> = documentoUtente.ref;
+    //Rimuovo il preferito
+    await updateDoc(refDocUtente, {
+      favourites: arrayRemove(this.router.url)
+    });
+  }
+
+  /**
+   * Controlla se la rotta corernte è tra i preferiti dell'utente
+   * @returns True se la rotta corrente è tra i preferiti, altrimenti false
+   */
+  async isPreferito(): Promise<boolean> {
+    //Prendo l'utente attualmente loggato
+    const utenteCorrente: firebase.User | null = await this.afAuth.currentUser;
+    if(utenteCorrente == null)
+      throw new Error("Utente non loggato");
+
+    //Prendo il suo documento
+    const documentoUtente: AngularFirestoreDocument<Utente> = this.afirestore.doc(`users/${utenteCorrente.uid}`);
+
+    //Prendo i favoriti dell'utente
+    let utenteCorrenteDatabase: Utente | undefined;
+    await documentoUtente.ref.get().then(snapshot => utenteCorrenteDatabase = snapshot.data());
+    let favoritiUtenteCorrente: string[];
+    if (utenteCorrenteDatabase && utenteCorrenteDatabase.favourites) {
+      favoritiUtenteCorrente = utenteCorrenteDatabase.favourites;
+    } else {
+      favoritiUtenteCorrente = [];
+    }
+
+    //Controllo se la rotta corrente è nella lista dei preferiti
+    return favoritiUtenteCorrente.includes(this.router.url);
+  }
 
 }

@@ -23,9 +23,6 @@ import { AngularFireAuthModule } from '@angular/fire/compat/auth';
 export const firebaseConfig = environment.firebaseConfig;
 import { AngularFirestoreModule } from "@angular/fire/compat/firestore";
 
-import { AngularFireStorageModule } from '@angular/fire/compat/storage';
-import { FirebaseService } from './servizi/firebase.service';
-
 const ROTTE: Routes = [
   { path: '', component: HomeComponent },
   { path: 'stagione', component: StagioniComponent},
@@ -61,7 +58,6 @@ const ROTTE: Routes = [
 
     AngularFireModule.initializeApp(firebaseConfig),
     AngularFireAuthModule,
-    AngularFireStorageModule,
     AngularFirestoreModule,
 
   ],

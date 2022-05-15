@@ -182,6 +182,10 @@ export class CostruttoriService {
             stagione = new Stagione(parseInt(posizione.season));
             //Aggiunta della stagione alla cache
             this.cache.stagioni.set(stagione.anno, stagione);
+
+            stagione = this.cache.stagioni.get(stagione.anno);
+            if(!stagione)
+              throw new Error("Errore nel caricamento della stagione");
           }
 
           //Prendo la posizione

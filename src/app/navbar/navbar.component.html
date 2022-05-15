@@ -1,35 +1,40 @@
 <div class="navbar bg-base-100 mb-10">
-    <button>login</button>
     <div></div>
     <div class="flex-1">
-        <a class="btn btn-ghost normal-case text-xl">
+        <a class="btn btn-ghost normal-case text-xl" routerLink="/">
             <img src="/assets/immagini/logo.svg" />
         </a>
     </div>
     <div class="flex-none gap-2">
-        <div class="form-control">
-            <input type="text" placeholder="Search" class="input input-bordered" />
-        </div>
-        <div *ngIf="firebaseService.user | async as user; else login" class="dropdown dropdown-end">
-            <label tabindex="0" class="btn btn-ghost btn-circle avatar">
-                <div class="w-10 rounded-full">
-                    <img [src]="user.photoURL" />
-                </div>
-            </label>
-            <ul tabindex="0" class="mt-3 p-2 shadow menu menu-compact dropdown-content bg-base-100 rounded-box w-52">
-                <li>
-                    <a class="justify-between">
-                        Ciao {{ user.displayName }}
-                        <span class="badge">New</span>
-                    </a>
-                </li>
-                <li><a>{{user.favourites}}</a></li>
-                <li><a (click)="firebaseService.signOut()">Logout</a></li>
-            </ul>
+        <div *ngIf="firebaseService.utente | async as user; else login">
+            <button *ngIf="!firebaseService.isPreferito(); else rimuovi" class="btn gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg>
+                Aggiungi ai preferiti
+            </button>
+            <ng-template #rimuovi>
+                <button class="btn gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="white" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg>
+                    Rimuovi dai preferiti
+                </button>
+            </ng-template>
+            
+
+            <div class="dropdown dropdown-end">
+                <label tabindex="0" class="btn btn-ghost btn-circle avatar">
+                    <div class="w-10 rounded-full">
+                        <img [src]="user.photoURL" />
+                    </div>
+                </label>
+                <ul tabindex="0"
+                    class="mt-3 p-2 shadow menu menu-compact dropdown-content bg-base-100 rounded-box w-52">
+                    <li><a (click)="firebaseService.signOut()">Logout</a></li>
+                </ul>
+            </div>
         </div>
         <ng-template #login>
             <button (click)="firebaseService.googleSignin()" class="btn btn-ghost normal-case">
-                <img class="h-6 w-6 pr-1" viewBox="0 0 24 24" src="/assets/immagini/googlelogo.svg" /> 
+                <img class="h-6 w-6 pr-1"
+                    src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg" />
                 Login con Google
             </button>
         </ng-template>

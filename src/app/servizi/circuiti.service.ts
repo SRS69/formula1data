@@ -37,7 +37,7 @@ export class CircuitiService {
         console.log(circuiti);
 
         //Richiesta API wiki per ottenere le immagini dei circuiti
-        const urls: string[] = this.api.estraiTitoliDaVettoreGenerico(circuiti.MRData.CircuitTable.Circuits);
+        //const urls: string[] = this.api.estraiTitoliDaVettoreGenerico(circuiti.MRData.CircuitTable.Circuits);
         this.api.getDataWikipedia(["List_of_Formula_One_circuits"], this.api.imageSize).subscribe((wikiData: any) => {
           console.log(wikiData);
 
@@ -135,6 +135,10 @@ export class CircuitiService {
           if (stagione === undefined) {
             stagione = new Stagione(parseInt(garaData.season));
             this.cache.stagioni.set(stagione.anno, stagione);
+
+            stagione = this.cache.stagioni.get(stagione.anno);
+            if(!stagione)
+              throw new Error("Errore nel caricamento della stagione");
           }
           //Prendo la gara
           let gara: Gara | undefined = stagione.gare.get(parseInt(garaData.round));
