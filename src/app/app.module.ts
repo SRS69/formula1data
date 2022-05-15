@@ -16,6 +16,16 @@ import { CostruttoreComponent } from './costruttori/costruttore/costruttore.comp
 import { GaraComponent } from './stagioni/gara/gara.component';
 import { HomeComponent } from './home/home.component';
 
+import { environment } from '../environments/environment';
+import { AngularFireModule } from '@angular/fire/compat';
+
+import { AngularFireAuthModule } from '@angular/fire/compat/auth';
+export const firebaseConfig = environment.firebaseConfig;
+import { AngularFirestoreModule } from "@angular/fire/compat/firestore";
+
+import { AngularFireStorageModule } from '@angular/fire/compat/storage';
+import { FirebaseService } from './servizi/firebase.service';
+
 const ROTTE: Routes = [
   { path: '', component: HomeComponent },
   { path: 'stagione', component: StagioniComponent},
@@ -47,9 +57,15 @@ const ROTTE: Routes = [
   imports: [
     BrowserModule,
     HttpClientModule,
-    RouterModule.forRoot(ROTTE)
+    RouterModule.forRoot(ROTTE),
+
+    AngularFireModule.initializeApp(firebaseConfig),
+    AngularFireAuthModule,
+    AngularFireStorageModule,
+    AngularFirestoreModule,
+
   ],
-  providers: [],
+  providers: [FirebaseService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
