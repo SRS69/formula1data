@@ -65,7 +65,7 @@ const ROTTE: Routes = [
     AngularFirestoreModule,
 
   ],
-  providers: [FirebaseService],
+  providers: [],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

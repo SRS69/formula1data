@@ -18,10 +18,6 @@ export class NavbarComponent implements OnInit {
   ngOnInit(): void {
   }
 
-  login() {
-    this.firebaseService.googleSignin();
-  }
-
   //#faf1f2 --> bg-neutral-100 (bianco)
   //#295395 --> (blu)
   //#101011 --> (nero)
