@@ -127,31 +127,5 @@ export class FirebaseService {
     });
   }
 
-  /**
-   * Controlla se la rotta corernte è tra i preferiti dell'utente
-   * @returns True se la rotta corrente è tra i preferiti, altrimenti false
-   */
-  async isPreferito(): Promise<boolean> {
-    //Prendo l'utente attualmente loggato
-    const utenteCorrente: firebase.User | null = await this.afAuth.currentUser;
-    if(utenteCorrente == null)
-      throw new Error("Utente non loggato");
-
-    //Prendo il suo documento
-    const documentoUtente: AngularFirestoreDocument<Utente> = this.afirestore.doc(`users/${utenteCorrente.uid}`);
-
-    //Prendo i favoriti dell'utente
-    let utenteCorrenteDatabase: Utente | undefined;
-    await documentoUtente.ref.get().then(snapshot => utenteCorrenteDatabase = snapshot.data());
-    let favoritiUtenteCorrente: string[];
-    if (utenteCorrenteDatabase && utenteCorrenteDatabase.favourites) {
-      favoritiUtenteCorrente = utenteCorrenteDatabase.favourites;
-    } else {
-      favoritiUtenteCorrente = [];
-    }
-
-    //Controllo se la rotta corrente è nella lista dei preferiti
-    return favoritiUtenteCorrente.includes(this.router.url);
-  }
 
 }
