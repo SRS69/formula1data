@@ -21,7 +21,17 @@ export class NavbarComponent implements OnInit {
 
   titloLink(link: string): string {
     const linkScomposto: string[] = link.split('/');
-    return linkScomposto[0].toUpperCase() + ': ' + linkScomposto[1].toUpperCase();
+    if(linkScomposto.length < 3)
+      throw new Error('Link non valido');
+      
+    let r: string = "";
+    if(linkScomposto.length > 3) {
+      r = "GARA: "  + linkScomposto[2].toUpperCase() + " - " + linkScomposto[3].toUpperCase();
+    }
+    else
+      r = linkScomposto[1].toUpperCase() + ': ' + linkScomposto[2].toUpperCase();
+
+    return r
   }
 
   //#faf1f2 --> bg-neutral-100 (bianco)

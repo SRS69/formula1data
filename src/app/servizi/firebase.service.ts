@@ -104,6 +104,9 @@ export class FirebaseService {
     const documentoUtente: AngularFirestoreDocument<Utente> = this.afirestore.doc(`users/${utenteCorrente.uid}`);
     const refDocUtente: DocumentReference<Utente> = documentoUtente.ref;
 
+    if(this.router.url == "/" || this.router.url == "/pilota" || this.router.url == "/costruttore" || this.router.url == "/circuito" || this.router.url == "/stagione")
+      throw new Error("Impossibile aggiungere ai preferiti questa rotta");
+
     //Aggiungo il preferito
     await updateDoc(refDocUtente, {
       favourites: arrayUnion(this.router.url)
