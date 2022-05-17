@@ -73,7 +73,7 @@ export class CostruttoriService {
 
     //Richiesta API per ottenere l'immagine del costruttore
     //const wikiData: any = await lastValueFrom(this.api.getDataWikipedia(this.api.estraiTitoliDaUrls([costruttore.MRData.ConstructorTable.Constructors[0].url]), this.api.imageSize));
-    const wikiData: any = await lastValueFrom(this.api.getDataWikipedia([costruttore.MRData.ConstructorTable.Constructors[0].url], this.api.imageSize))
+    const wikiData: any = await lastValueFrom(this.api.getDataWikipedia(this.api.estraiTitoliDaUrls([costruttore.MRData.ConstructorTable.Constructors[0].url]), this.api.imageSize))
     console.log(wikiData);
 
     //Link dell'immagine del costruttore

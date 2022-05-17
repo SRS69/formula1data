@@ -1,5 +1,5 @@
-<div class="bg-base-100 mb-10 flex-col">
-    <div class="navbar bg-base-100">
+<div class="max-w-screen-3xl mb-10 flex-col mx-auto">
+    <div class="navbar">
         <div class="navbar-start">
             <div class="dropdown">
                 <label tabindex="0" class="btn btn-ghost md:hidden">
@@ -107,8 +107,8 @@
     <div *ngIf="firebaseService.utente | async as user">
         <div *ngIf="user.favourites !== null && user.favourites.length > 0" class="flex flex-col max-w-full">
             <div class="divider m-0"></div>
-            <div class="overflow-auto h-min flex flex-nowrap p-2">
-                <div *ngFor="let favorito of user.favourites" routerLink="{{favorito}}" class="btn btn-xs">{{titloLink(favorito)}}</div>
+            <div class="overflow-auto h-min flex flex-nowrap p-2 gap-2">
+                <div *ngFor="let favorito of user.favourites" routerLink="{{favorito}}" class="btn btn-secondary btn-xs">{{titloLink(favorito)}}</div>
             </div>
         </div>
     </div>

@@ -1,12 +1,10 @@
-<div class="mx-auto w-11/12 mb-6">
+<div class="mx-auto max-w-screen-2xl w-11/12 mb-8 flex flex-col gap-8">
     <div class="text-center">
         <h1 class="text-2xl font-bold">Stagione {{selezione?.stagione?.anno}} - Round {{selezione?.round}}</h1>
         <h2 class="text-xl font-semibold">{{selezione?.nome}}</h2>
     </div>
 
-    <a routerLink="/circuito/{{selezione?.circuito?.id}}">sium</a>
-
-    <div class="border flex-auto xl:w-2/3 h-max">
+    <div class="flex-auto h-max">
         <h2 class="text-center text-xl font-semibold mb-2">Classifica Piloti</h2>
         <div class="overflow-x-auto overflow-y-auto">
           <table class="table table-compact w-full text-center">
@@ -22,7 +20,7 @@
               </tr>
             </thead>
             <tbody>
-              <tr class="cursor-pointer hover" *ngFor="let posto of selezione?.classificaGara| keyvalue; let i = index" [ngClass]="{'active': i%2!==0}">
+              <tr class="cursor-pointer hover" *ngFor="let posto of selezione?.classificaGara| keyvalue">
                 <td>{{posto.value.posizione}}</td>
                 <td>{{posto.value.pilota.nome + ' ' + posto.value.pilota.cognome}}</td>
                 <td>{{posto.value.costruttore.nome}}</td>
