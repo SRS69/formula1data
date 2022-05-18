@@ -1,7 +1,6 @@
 import { KeyValue } from '@angular/common';
 import { AfterContentChecked, AfterContentInit, AfterViewChecked, AfterViewInit, Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { fromEvent, of } from 'rxjs';
 import { Costruttore } from 'src/app/classi/costruttore';
 import { PostoClassificaCostruttori } from 'src/app/classi/stagione';
 import { CostruttoriService } from 'src/app/servizi/costruttori.service';
@@ -69,12 +68,12 @@ export class CostruttoreComponent implements OnInit, AfterViewChecked {
 
     //Altezza nulla
     if (!hTab) {
-      carta.style.maxHeight = "0px";
+      carta.style.maxHeight = "500px";
       return;
     }
 
     if(window.innerWidth < 1280) {
-      carta.style.maxHeight = "";
+      carta.style.maxHeight = "fit-content";
       return;
     }
 
