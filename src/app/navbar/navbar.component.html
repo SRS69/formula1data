@@ -1,4 +1,4 @@
-<div class="max-w-screen-3xl mb-10 flex-col mx-auto">
+<div class="max-w-screen-3xl flex-col mx-auto">
     <div class="navbar">
         <div class="navbar-start">
             <div class="dropdown">
@@ -21,7 +21,7 @@
             </a>
         </div>
         <div class="navbar-center hidden md:flex">
-            <ul class="menu menu-horizontal p-0">
+            <ul class="menu menu-horizontal p-0 gap-1">
                 <li><a routerLink="/stagione">Stagioni</a></li>
                 <li><a routerLink="/circuito">Circuiti</a></li>
                 <li><a routerLink="/pilota">Piloti</a></li>
@@ -63,47 +63,7 @@
             </ng-template>
         </div>
     </div>
-    <!-- <div class="navbar">
-        <div class="flex-1">
-            <a class="btn btn-ghost normal-case text-xl" routerLink="/">
-                <img src="/assets/immagini/logo.svg" />
-            </a>
-        </div>
-        <div class="flex-none gap-2">
-            <div *ngIf="firebaseService.utente | async as user; else login" class="flex gap-2">
-                <button [ngClass]="{'btn-disabled': this.router.url == '/' || this.router.url == '/pilota' || this.router.url == '/costruttore'
-            || this.router.url == '/circuito' || this.router.url == '/stagione'}"
-                    *ngIf="!user.favourites?.includes(this.router.url); else rimuovi" class="btn btn-circle btn-ghost gap-2
-            mask mask-star active:bg-gray-500 hover:bg-gray-500 bg-gray-500" (click)="firebaseService.addFavourite()">
-                </button>
-                <ng-template #rimuovi>
-                    <button class="btn btn-circle btn-ghost gap-2
-                mask mask-star active:bg-yellow-400 hover:bg-yellow-400 bg-yellow-400"
-                        (click)="firebaseService.removeFavourite()">
-                    </button>
-                </ng-template>
 
-                <div class="dropdown dropdown-end m">
-                    <label tabindex="0" class="btn btn-ghost btn-circle avatar">
-                        <div class="w-10 rounded-full">
-                            <img [src]="user.photoURL" />
-                        </div>
-                    </label>
-                    <ul tabindex="0"
-                        class="mt-3 p-2 shadow menu menu-compact dropdown-content bg-base-100 rounded-box w-52">
-                        <li><a (click)="firebaseService.signOut()">Logout</a></li>
-                    </ul>
-                </div>
-            </div>
-            <ng-template #login>
-                <button (click)="firebaseService.googleSignin()" class="btn btn-ghost normal-case">
-                    <img class="h-6 w-6 pr-1"
-                        src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg" />
-                    Login con Google
-                </button>
-            </ng-template>
-        </div>
-    </div> -->
     <div *ngIf="firebaseService.utente | async as user">
         <div *ngIf="user.favourites !== null && user.favourites.length > 0" class="flex flex-col max-w-full">
             <div class="divider m-0"></div>

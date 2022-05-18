@@ -44,7 +44,8 @@ export class PilotiService {
           piloti.MRData.DriverTable.Drivers.forEach((pilota: any) => {
             if (!this.cache.piloti.has(pilota.driverId)) {
               //Link dell'immagine del pilota
-              let immagine: string = this.api.getImageUrlFromPage(wikiData.query.pages[this.api.wikiFromTitleToId(this.api.estraiTitoliDaUrls([pilota.url])[0], wikiData)], [pilota.familyName]);
+              let immagine: string = this.api.getImageUrlPilota(wikiData.query.pages[this.api.wikiFromTitleToId(this.api.estraiTitoliDaUrls([pilota.url])[0], wikiData)], pilota);
+              //this.api.getImageUrlFromPage(wikiData.query.pages[this.api.wikiFromTitleToId(this.api.estraiTitoliDaUrls([pilota.url])[0], wikiData)], [pilota.familyName]);
               //Aggiunta del pilota alla cache
               this.cache.piloti.set(pilota.driverId,
                 new Pilota(pilota.driverId, immagine, pilota.givenName, pilota.familyName, new Date(pilota.dateOfBirth), pilota.nationality, pilota.permanentNumber, pilota.code));
@@ -81,7 +82,8 @@ export class PilotiService {
     console.log(wikiData);
 
     //Link dell'immagine del pilota
-    let immagine: string = this.api.getImageUrlFromPage(wikiData.query.pages[wikiData.query.pageids[0]], [pilota.MRData.DriverTable.Drivers[0].familyName]);
+    let immagine: string = this.api.getImageUrlPilota(wikiData.query.pages[wikiData.query.pageids[0]], pilota.MRData.DriverTable.Drivers[0]);
+    //this.api.getImageUrlFromPage(wikiData.query.pages[wikiData.query.pageids[0]], [pilota.MRData.DriverTable.Drivers[0].familyName]);
 
     //Aggiunta del pilota alla cache
     this.cache.piloti.set(pilota.MRData.DriverTable.Drivers[0].driverId,
@@ -130,7 +132,8 @@ export class PilotiService {
             const wikiData: any = await lastValueFrom(this.api.getDataWikipedia(this.api.estraiTitoliDaUrls([costruttoreFromData.url]), this.api.imageSize));
             console.log(wikiData);
             //Link dell'immagine del costruttore
-            let immagine: string = this.api.getImageUrlFromPage(wikiData.query.pages[wikiData.query.pageids[0]], [costruttoreFromData.constructorId, "logo"]);
+            let immagine: string = this.api.getImageUrlCostruttore(wikiData.query.pages[wikiData.query.pageids[0]], costruttoreFromData);
+            //this.api.getImageUrlFromPage(wikiData.query.pages[wikiData.query.pageids[0]], [costruttoreFromData.constructorId, "logo"]);
             //Creazione del costruttore
             costruttore = new Costruttore(costruttoreFromData.constructorId, costruttoreFromData.name, immagine, costruttoreFromData.nationality);
             //Aggiunta del costruttore alla cache
@@ -212,7 +215,8 @@ export class PilotiService {
               const wikiData: any = await lastValueFrom(this.api.getDataWikipedia(this.api.estraiTitoliDaUrls([posizione.DriverStandings[0].Constructors[0].url]), this.api.imageSize));
               console.log(wikiData);
               //Link dell'immagine del costruttore
-              let immagine: string = this.api.getImageUrlFromPage(wikiData.query.pages[wikiData.query.pageids[0]], [posizione.DriverStandings[0].Constructors[0].constructorId, "logo"]);
+              let immagine: string = this.api.getImageUrlCostruttore(wikiData.query.pages[wikiData.query.pageids[0]], posizione.DriverStandings[0].Constructors[0]);
+              //this.api.getImageUrlFromPage(wikiData.query.pages[wikiData.query.pageids[0]], [posizione.DriverStandings[0].Constructors[0].constructorId, "logo"]);
               //Creazione del costruttore
               costruttore = new Costruttore(posizione.DriverStandings[0].Constructors[0].constructorId, posizione.DriverStandings[0].Constructors[0].name, immagine,
                 posizione.DriverStandings[0].Constructors[0].nationality);

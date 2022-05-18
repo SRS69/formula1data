@@ -127,10 +127,10 @@ export class ApiService {
   }
 
   
-  getImageUrlFromPage(page: any, searchInImages?: string[]): string {
+  getImageUrlFromPage(page: any, forceThumbnail:boolean, searchInImages?: string[]): string {
     //Controlla se c'è l'immagine "ufficiale" della pagina
     if (page?.thumbnail?.source) {
-      if (searchInImages) {
+      if (searchInImages && !forceThumbnail) {
         for (let i = 0; i < searchInImages.length; i++) {
           const titoloThumbnail: string = page.thumbnail.source;
           if ((titoloThumbnail.toLowerCase()).includes(searchInImages[i].toLowerCase())) {
@@ -187,4 +187,16 @@ export class ApiService {
     return maxIndex;
   }
 
+  getImageUrlCircuito(page: any, circuito: { circuitId: string; circuitName: string; Location: { locality: string; country: string; }; }): string {
+    let searchInImages: string[] = ((circuito.circuitId).replace("_", "&")+"&"+(circuito.circuitName+"&"+circuito.Location.locality+"&"+circuito.Location.country).replace(" ", "&")).split("&");
+    return this.getImageUrlFromPage(page, false, searchInImages);
+  }
+
+  getImageUrlCostruttore(page: any, costruttore: { constructorId: string; }): string {
+    return this.getImageUrlFromPage(page, true, [costruttore.constructorId, "logo"]);
+  }
+
+  getImageUrlPilota(page: any, pilota: { familyName: string; }): string {
+    return this.getImageUrlFromPage(page, true, [pilota.familyName]);
+  }
 }
