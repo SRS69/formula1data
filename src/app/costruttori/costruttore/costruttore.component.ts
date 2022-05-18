@@ -1,7 +1,7 @@
 import { KeyValue } from '@angular/common';
 import { AfterContentChecked, AfterContentInit, AfterViewChecked, AfterViewInit, Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { of } from 'rxjs';
+import { fromEvent, of } from 'rxjs';
 import { Costruttore } from 'src/app/classi/costruttore';
 import { PostoClassificaCostruttori } from 'src/app/classi/stagione';
 import { CostruttoriService } from 'src/app/servizi/costruttori.service';
@@ -14,6 +14,7 @@ import { CostruttoriService } from 'src/app/servizi/costruttori.service';
 export class CostruttoreComponent implements OnInit, AfterViewChecked {
 
   selezione: Costruttore | undefined;
+  resizeObservable$: any;
   constructor(private costruttoriService: CostruttoriService, private activatedRoute: ActivatedRoute, private router: Router) { }
   ngAfterViewChecked(): void {
     this.setMaxAltezzaCard();
@@ -55,6 +56,7 @@ export class CostruttoreComponent implements OnInit, AfterViewChecked {
    * Imposta l'altezza della carta
    */
   setMaxAltezzaCard() {
+    console.log("A")
     //Altezza della tabella
     let hTab: number | undefined = document.getElementById('tab')?.clientHeight;
     if(!hTab)
@@ -68,6 +70,12 @@ export class CostruttoreComponent implements OnInit, AfterViewChecked {
     //Altezza nulla
     if (!hTab) {
       carta.style.maxHeight = "0px";
+      return;
+    }
+
+    if(window.innerWidth < 1280) {
+      carta.style.maxHeight = "";
+      return;
     }
 
     //Tabella più alta dello schermo

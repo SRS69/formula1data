@@ -1,4 +1,4 @@
-<div class="mx-auto w-11/12 max-w-screen-2xl flex flex-col gap-8 xl:flex-row">
+<div class="mx-auto w-11/12 max-w-screen-2xl flex flex-col gap-8 xl:flex-row" (resize)="this.setMaxAltezzaCard()">
 
     <div id="carta" class="card card-side bg-base-100 shadow-xl w-full xl:w-3/8 flex-col gap-3">
         <div class="flex md:flex-row flex-col-reverse">
@@ -36,7 +36,7 @@
                 <table class="table table-compact w-full text-center">
                     <thead class="sticky top-0">
                         <tr>
-                            <th>Nome</th>
+                            <th class="relative">Nome</th>
                             <th>Data di nascita</th>
                         </tr>
                     </thead>
@@ -58,7 +58,7 @@
 
     <div id="tab" class="w-full h-max xl:w-5/8 mt-4">
         <h2 class="text-center text-xl font-semibold mb-2">Stagioni</h2>
-        <div class="max-h-full">
+        <div class="max-h-[500px] xl:max-h-full overflow-auto xl:overflow-clip">
             <table class="table table-compact w-full text-center">
                 <thead class="sticky top-0">
                     <tr>
