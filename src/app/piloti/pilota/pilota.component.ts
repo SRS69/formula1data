@@ -1,6 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { KeyValue } from '@angular/common';
+import { AfterViewChecked, Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Pilota } from 'src/app/classi/pilota';
+import { PostoClassificaPiloti } from 'src/app/classi/stagione';
 import { PilotiService } from 'src/app/servizi/piloti.service';
 
 @Component({
@@ -8,10 +10,13 @@ import { PilotiService } from 'src/app/servizi/piloti.service';
   templateUrl: './pilota.component.html',
   styleUrls: ['./pilota.component.css']
 })
-export class PilotaComponent implements OnInit {
+export class PilotaComponent implements OnInit, AfterViewChecked {
 
   selezione: Pilota | undefined;
   constructor(private pilotiService: PilotiService, private activatedRoute: ActivatedRoute, private router: Router) {
+  }
+  ngAfterViewChecked(): void {
+    this.setMaxAltezzaCard();
   }
 
   ngOnInit(): void {
@@ -42,4 +47,40 @@ export class PilotaComponent implements OnInit {
     }
   }
 
+  inversKey = (a: KeyValue<number, PostoClassificaPiloti>, b: KeyValue<number, PostoClassificaPiloti>): number => {
+    return a.key > b.key ? -1 : (b.key > a.key ? 1 : 0);
+  }
+
+  setMaxAltezzaCard() {
+    console.log("A")
+    //Altezza della tabella
+    let hTab: number | undefined = document.getElementById('tab')?.clientHeight;
+    if(!hTab)
+      return;
+
+    //Carta    
+    let carta = document.getElementById('carta');
+    if(!carta)
+      return;
+
+    //Altezza nulla
+    if (!hTab) {
+      carta.style.maxHeight = "500px";
+      return;
+    }
+
+    if(window.innerWidth < 1280) {
+      carta.style.maxHeight = "fit-content";
+      return;
+    }
+
+    //Tabella più alta dello schermo
+    if (hTab > window.innerHeight) {
+      carta.style.maxHeight = hTab + "px";
+      return;
+    }
+
+    //Tabella più piccolo dello schermo
+    carta.style.maxHeight = (window.innerHeight - 200) + "px";
+  }
 }
