@@ -34,11 +34,11 @@ export class PilotiService {
     if (!this.cache.pilBool) {
       //Richiesta API per ottenere i piloti di F1
       this.api.getDataF1Api('https://ergast.com/api/f1/drivers.json', offset).subscribe((piloti: any) => {
-        console.log(piloti);
+        //console.log(piloti);
 
         //Richiesta API wiki per ottenere le immagini di tutti i piloti
         this.api.getDataWikipedia(this.api.estraiTitoliDaVettoreGenerico(piloti.MRData.DriverTable.Drivers), this.api.imageSize).subscribe((wikiData: any) => {
-          console.log(wikiData);
+          //console.log(wikiData);
 
           //Inserimento dei piloti nella cache
           piloti.MRData.DriverTable.Drivers.forEach((pilota: any) => {
@@ -62,7 +62,7 @@ export class PilotiService {
       });
     }
 
-    console.warn(this.cache);
+    //console.warn(this.cache);
   }
   /**
    * Carica un singolo pilota in cache
@@ -75,11 +75,11 @@ export class PilotiService {
 
     //Richiesta API per il pilota
     const pilota: any = await lastValueFrom(this.api.getDataF1Api(`https://ergast.com/api/f1/drivers/${id}.json`, 0));
-    console.log(pilota);
+    //console.log(pilota);
 
     //Richiesta API per ottenere l'immagine del pilota
     const wikiData: any = await lastValueFrom(this.api.getDataWikipedia(this.api.estraiTitoliDaUrls([pilota.MRData.DriverTable.Drivers[0].url]), this.api.imageSize))
-    console.log(wikiData);
+    //console.log(wikiData);
 
     //Link dell'immagine del pilota
     let immagine: string = this.api.getImageUrlPilota(wikiData.query.pages[wikiData.query.pageids[0]], pilota.MRData.DriverTable.Drivers[0]);
@@ -120,7 +120,7 @@ export class PilotiService {
     if (!pilota.costruttoriBool) {
       //Richiesta API per ottenere i costruttori
       this.api.getDataF1Api(`https://ergast.com/api/f1/drivers/${pilota.id}/constructors.json`, offset).subscribe((costruttori: any) => {
-        console.log(costruttori);
+        //console.log(costruttori);
 
         //Inserisco i costruttori nella cache
         costruttori.MRData.ConstructorTable.Constructors.forEach(async (costruttoreFromData: any) => {
@@ -130,7 +130,7 @@ export class PilotiService {
           if (costruttore === undefined) {
             //Richiesta API wiki per ottenere l'immagine del costruttore
             const wikiData: any = await lastValueFrom(this.api.getDataWikipedia(this.api.estraiTitoliDaUrls([costruttoreFromData.url]), this.api.imageSize));
-            console.log(wikiData);
+            //console.log(wikiData);
             //Link dell'immagine del costruttore
             let immagine: string = this.api.getImageUrlCostruttore(wikiData.query.pages[wikiData.query.pageids[0]], costruttoreFromData);
             //this.api.getImageUrlFromPage(wikiData.query.pages[wikiData.query.pageids[0]], [costruttoreFromData.constructorId, "logo"]);
@@ -155,7 +155,7 @@ export class PilotiService {
         }
       });
     }
-    console.log(this.cache)
+    //console.log(this.cache)
   }
 
 
@@ -185,7 +185,7 @@ export class PilotiService {
     if (!pilota.stagioniBool) {
       //Richiesta API per ottenere le stagioni e le posizioni
       this.api.getDataF1Api(`https://ergast.com/api/f1/drivers/${pilota.id}/driverStandings.json`, offset).subscribe((stagioniEPosizione: any) => {
-        console.log(stagioniEPosizione);
+        //console.log(stagioniEPosizione);
 
         //Inserisco i risultati nella cache
         stagioniEPosizione.MRData.StandingsTable.StandingsLists.forEach(async (posizione: any) => {
@@ -213,7 +213,7 @@ export class PilotiService {
             if (costruttore === undefined) {
               //Richiesta API wiki per ottenere l'immagine del costruttore
               const wikiData: any = await lastValueFrom(this.api.getDataWikipedia(this.api.estraiTitoliDaUrls([posizione.DriverStandings[0].Constructors[0].url]), this.api.imageSize));
-              console.log(wikiData);
+              //console.log(wikiData);
               //Link dell'immagine del costruttore
               let immagine: string = this.api.getImageUrlCostruttore(wikiData.query.pages[wikiData.query.pageids[0]], posizione.DriverStandings[0].Constructors[0]);
               //this.api.getImageUrlFromPage(wikiData.query.pages[wikiData.query.pageids[0]], [posizione.DriverStandings[0].Constructors[0].constructorId, "logo"]);
@@ -250,7 +250,7 @@ export class PilotiService {
         }
       });
     }
-    console.log(pilota.stagioniERisultato);
+    //console.log(pilota.stagioniERisultato);
   }
 
 

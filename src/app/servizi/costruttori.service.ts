@@ -30,11 +30,11 @@ export class CostruttoriService {
   private loadTuttiCostruttoriRicorsivo(offset: number) {
     //Richiesta API per ottenere i costruttori di F1
     this.api.getDataF1Api('https://ergast.com/api/f1/constructors.json', offset).subscribe((costruttori: any) => {
-      console.log(costruttori);
+      //console.log(costruttori);
 
       //Richiesta API wiki per ottenere le immagini di tutti i costruttori
       this.api.getDataWikipedia(this.api.estraiTitoliDaVettoreGenerico(costruttori.MRData.ConstructorTable.Constructors), this.api.imageSize).subscribe((wikiData: any) => {
-        console.log(wikiData);
+        //console.log(wikiData);
 
         //Inserimento dei costruttori nella cache
         costruttori.MRData.ConstructorTable.Constructors.forEach((costruttore: any) => {
@@ -57,7 +57,7 @@ export class CostruttoriService {
       });
     });
 
-    console.warn(this.cache);
+    //console.warn(this.cache);
   }
   /**
    * Carica un singolo costruttore in cache
@@ -70,12 +70,12 @@ export class CostruttoriService {
 
     //Richiesta API per il costruttore
     const costruttore: any = await lastValueFrom(this.api.getDataF1Api(`https://ergast.com/api/f1/constructors/${id}.json`, 0));
-    console.log(costruttore);
+    //console.log(costruttore);
 
     //Richiesta API per ottenere l'immagine del costruttore
     //const wikiData: any = await lastValueFrom(this.api.getDataWikipedia(this.api.estraiTitoliDaUrls([costruttore.MRData.ConstructorTable.Constructors[0].url]), this.api.imageSize));
     const wikiData: any = await lastValueFrom(this.api.getDataWikipedia(this.api.estraiTitoliDaUrls([costruttore.MRData.ConstructorTable.Constructors[0].url]), this.api.imageSize))
-    console.log(wikiData);
+    //console.log(wikiData);
 
     //Link dell'immagine del costruttore
     let immagine: string = this.api.getImageUrlCostruttore(wikiData.query.pages[wikiData.query.pageids[0]], costruttore.MRData.ConstructorTable.Constructors[0]);
@@ -114,7 +114,7 @@ export class CostruttoriService {
     if (!costruttore.pilotiBool) {
       //Richiesta API per ottenere i piloti
       this.api.getDataF1Api(`https://ergast.com/api/f1/constructors/${costruttore.id}/drivers.json`, offset).subscribe((piloti: any) => {
-        console.log(piloti);
+        //console.log(piloti);
 
         //Inserisco i piloti nella cache
         piloti.MRData.DriverTable.Drivers.forEach(async (pilotaData: any) => {
@@ -124,7 +124,7 @@ export class CostruttoriService {
           if (pilota === undefined) {
             //Ruchiesta API wiki per ottenere l'immagine del pilota
             const wikiData: any = await lastValueFrom(this.api.getDataWikipedia(this.api.estraiTitoliDaUrls([pilotaData.url]), this.api.imageSize));
-            console.log(wikiData);
+            //console.log(wikiData);
             //Link dell'immagine del pilota
             let immagine: string = this.api.getImageUrlPilota(wikiData.query.pages[wikiData.query.pageids[0]], pilotaData);
             //this.api.getImageUrlFromPage(wikiData.query.pages[wikiData.query.pageids[0]], [pilotaData.familyName]);
@@ -173,7 +173,7 @@ export class CostruttoriService {
     if (!costruttore.stagioniBool) {
       //Richiesta API per ottenere le stagioni
       this.api.getDataF1Api(`https://ergast.com/api/f1/constructors/${costruttore.id}/constructorStandings.json`, offset).subscribe((stagioniEPosizione: any) => {
-        console.log(stagioniEPosizione);
+        //console.log(stagioniEPosizione);
 
         //Inserisco le stagioni e risultati nella cache
         stagioniEPosizione.MRData.StandingsTable.StandingsLists.forEach(async (posizione: any) => {

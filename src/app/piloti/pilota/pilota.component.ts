@@ -52,7 +52,7 @@ export class PilotaComponent implements OnInit, AfterViewChecked {
   }
 
   setMaxAltezzaCard() {
-    console.log("A")
+    //console.log("A")
     //Altezza della tabella
     let hTab: number | undefined = document.getElementById('tab')?.clientHeight;
     if(!hTab)

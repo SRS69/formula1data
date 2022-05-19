@@ -18,7 +18,7 @@ export class CircuitoComponent implements OnInit {
   constructor(private circuitiService: CircuitiService, private route: ActivatedRoute) { }
 
   ngOnInit(): void {
-    console.log(this.route.snapshot.params);
+    //console.log(this.route.snapshot.params);
     if(this.id) {
       this.selezionaCircuito(this.id);
     }

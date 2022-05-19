@@ -15,7 +15,7 @@ export class ListaPilotiComponent implements OnInit {
 
   ngOnInit(): void {
     this.mappaPiloti = this.pilotiService.getTuttiPiloti();
-    console.log(this.mappaPiloti);
+    //console.log(this.mappaPiloti);
   }
 
 }

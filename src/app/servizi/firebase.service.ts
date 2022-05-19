@@ -68,7 +68,7 @@ export class FirebaseService {
     //Prendo l'utente correntemente caricato nel database
     let utenteCorrente: Utente | undefined;
     await documentoUtente.ref.get().then(snapshot => utenteCorrente = snapshot.data());
-    console.log(utenteCorrente);
+    //console.log(utenteCorrente);
 
     //Prendo i favoriti dell'utente corentemente caricato
     let favoritiUtenteCorrente: string[];

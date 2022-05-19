@@ -16,7 +16,7 @@ export class ListaCircuitiComponent implements OnInit {
   
   ngOnInit(): void {
     this.mappaCiruciti = this.circuitiService.getTuttiCircuiti();
-    console.log(this.mappaCiruciti);
+    //console.log(this.mappaCiruciti);
   }
 
 }

@@ -168,7 +168,6 @@ export class ApiService {
    * @returns Indice dell'immagine più probabile
    */
   private risultatoPiuProbabile(page: any, filtri: string[], bannedImages?: string[]): number {
-    //Iterate over the images of the page and, for each image, return the number of times a string from the searchInImages array is found in the image title
     if (!page.images)
       return -1;
 

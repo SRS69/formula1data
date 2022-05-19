@@ -39,7 +39,7 @@ export class StagioniService {
     if (!this.cache.stagBool) {
       //Richiesta API per ottenere le stagioni di F1 presenti dopo l'offset
       this.api.getDataF1Api('https://ergast.com/api/f1/seasons.json', offset).subscribe((stagioni: any) => {
-        console.log(stagioni);
+        //console.log(stagioni);
 
         //Inseriemento delle stagioni nella cache
         stagioni.MRData.SeasonTable.Seasons.forEach((stagione: any) => {
@@ -53,7 +53,7 @@ export class StagioniService {
         }
       });
     }
-    console.warn(this.cache);
+    //console.warn(this.cache);
   }
   /**
    * Carica una singola stagione in cache
@@ -68,7 +68,7 @@ export class StagioniService {
 
     //Richiesta API per la stagione (aspette che arrivi la risposta)
     const stagione: any = await lastValueFrom(this.api.getDataF1Api(`https://ergast.com/api/f1/${anno}/seasons.json`, 0));
-    console.log(stagione);
+    //console.log(stagione);
 
     //Aggiunta della stagione alla cache
     this.cache.stagioni.set(parseInt(stagione.MRData.SeasonTable.Seasons[0].season), new Stagione(parseInt(stagione.MRData.SeasonTable.Seasons[0].season)));
@@ -122,7 +122,7 @@ export class StagioniService {
     if (!stagione.gareBool) {
       //Richiesta API per ottenere le gare della stagione
       this.api.getDataF1Api(`https://ergast.com/api/f1/${stagione.anno}.json`, offset).subscribe(async (gare: any) => {
-        console.log(gare);
+        //console.log(gare);
 
         //Inserimento delle gare nella cache
         gare.MRData.RaceTable.Races.forEach(async (gara: any) => {
@@ -133,7 +133,7 @@ export class StagioniService {
             if (circuito === undefined) {
               //Richiesta API wiki per ottenere l'immagine del circuito
               const wikiData: any = await lastValueFrom(this.api.getDataWikipedia(["List_of_Formula_One_circuits"], this.api.imageSize));
-              console.log(wikiData);
+              //console.log(wikiData);
               //Link dell'immagine del circuito
               let immagine: string = this.api.getImageUrlCircuito(wikiData.query.pages[wikiData.query.pageids[0]], gara.Circuit);
               //this.api.getImageUrlFromPage(wikiData.query.pages[wikiData.query.pageids[0]], 
@@ -164,7 +164,7 @@ export class StagioniService {
       });
     }
 
-    console.warn(stagione);
+    //console.warn(stagione);
   }
   /**
    * Carica una singola gara in cache
@@ -191,7 +191,7 @@ export class StagioniService {
     if (circuito === undefined) {
       //Richiesta API wiki per ottenere l'immagine del circuito
       const wikiData: any = await lastValueFrom(this.api.getDataWikipedia(["List_of_Formula_One_circuits"], this.api.imageSize));
-      console.log(wikiData);
+      //console.log(wikiData);
       //Link dell'immagine del circuito
       let immagine: string = this.api.getImageUrlCircuito(wikiData.query.pages[wikiData.query.pageids[0]], gara.MRData.RaceTable.Races[0].Circuit);
       //this.api.getImageUrlFromPage(wikiData.query.pages[wikiData.query.pageids[0]],
@@ -210,7 +210,7 @@ export class StagioniService {
     stagione.gare.set(parseInt(gara.MRData.RaceTable.Races[0].round), new Gara(gara.MRData.RaceTable.Races[0].raceName,
       parseInt(gara.MRData.RaceTable.Races[0].round), new Date(gara.MRData.RaceTable.Races[0].date + " " + gara.MRData.RaceTable.Races[0].time), circuito, stagione));
 
-    console.log(stagione)
+    //console.log(stagione)
     return stagione.gare.get(round);
   }
 
@@ -245,7 +245,7 @@ export class StagioniService {
     if (!stagione.classificaPilotiBool) {
       //Faccio la richiesta API per ottenere la classifica
       this.api.getDataF1Api(`https://ergast.com/api/f1/${stagione.anno}/driverStandings.json`, offset).subscribe((classificaPiloti: any) => {
-        console.log(classificaPiloti);
+        //console.log(classificaPiloti);
 
         //Inserisco le posizioni nella cache
         classificaPiloti.MRData.StandingsTable.StandingsLists[0]?.DriverStandings.forEach(async (posizione: any) => {
@@ -255,7 +255,7 @@ export class StagioniService {
           if (pilota === undefined) {
             //Richiesta API wiki per ottenere l'immagine del pilota
             const wikiData: any = await lastValueFrom(this.api.getDataWikipedia(this.api.estraiTitoliDaUrls([posizione.Driver.url]), this.api.imageSize));
-            console.log(wikiData);
+            //console.log(wikiData);
             //Link dell'immagine del pilota
             let immagine: string = this.api.getImageUrlPilota(wikiData.query.pages[wikiData.query.pageids[0]], posizione.Driver);
             //this.api.getImageUrlFromPage(wikiData.query.pages[wikiData.query.pageids[0]], [posizione.Driver.familyName]);
@@ -275,7 +275,7 @@ export class StagioniService {
           if (costruttore === undefined) {
             //Richiesta API wiki per ottenere l'immagine del costruttore
             const wikiData: any = await lastValueFrom(this.api.getDataWikipedia(this.api.estraiTitoliDaUrls([posizione.Constructors[0].url]), this.api.imageSize));
-            console.log(wikiData);
+            //console.log(wikiData);
             //Link dell'immagine del costruttore
             let immagine: string = this.api.getImageUrlCostruttore(wikiData.query.pages[wikiData.query.pageids[0]], posizione.Constructors[0]);
             //this.api.getImageUrlFromPage(wikiData.query?.pages[wikiData.query.pageids[0]], [posizione.Constructors[0].constructorId, "logo"]);
@@ -335,7 +335,7 @@ export class StagioniService {
     if (!stagione.classificaCostruttoriBool) {
       //Faccio la richiesta API per ottenere la classifica
       this.api.getDataF1Api(`https://ergast.com/api/f1/${stagione.anno}/constructorStandings.json`, offset).subscribe((classificaCostruttori: any) => {
-        console.log(classificaCostruttori);
+        //console.log(classificaCostruttori);
 
         //Inserisco le posizioni nella cache
         classificaCostruttori.MRData.StandingsTable.StandingsLists[0]?.ConstructorStandings.forEach(async (posizione: any) => {
@@ -345,7 +345,7 @@ export class StagioniService {
           if (costruttore === undefined) {
             //Richiesta API wiki per ottenere l'immagine del costruttore
             const wikiData: any = await lastValueFrom(this.api.getDataWikipedia(this.api.estraiTitoliDaUrls([posizione.Constructor.url]), this.api.imageSize));
-            console.log(wikiData);
+            //console.log(wikiData);
             //Link dell'immagine del costruttore
             let immagine: string = this.api.getImageUrlCostruttore(wikiData.query.pages[wikiData.query.pageids[0]], posizione.Constructor);
             //this.api.getImageUrlFromPage(wikiData.query.pages[wikiData.query.pageids[0]], [posizione.Constructor.constructorId, "logo"]);
@@ -407,7 +407,7 @@ export class StagioniService {
     if (!gara.classificaGaraBool) {
       //Faccio la richiesta API per ottenere la classifica
       this.api.getDataF1Api(`https://ergast.com/api/f1/${gara.stagione.anno}/${gara.round}/results.json`, offset).subscribe((classificaGara: any) => {
-        console.log(classificaGara);
+        //console.log(classificaGara);
 
         //Inserisco le posizioni nella cache
         classificaGara.MRData.RaceTable.Races[0]?.Results.forEach(async (posizione: any) => {
@@ -417,7 +417,7 @@ export class StagioniService {
           if (pilota === undefined) {
             //Richiesta API wiki per ottenere l'immagine del pilota
             const wikiData: any = await lastValueFrom(this.api.getDataWikipedia(this.api.estraiTitoliDaUrls([posizione.Driver.url]), this.api.imageSize));
-            console.log(wikiData);
+            //console.log(wikiData);
             //Link dell'immagine del pilota
             let immagine: string = this.api.getImageUrlPilota(wikiData.query.pages[wikiData.query.pageids[0]], posizione.Driver);
             //this.api.getImageUrlFromPage(wikiData.query.pages[wikiData.query.pageids[0]], [posizione.Driver.familyName]);
@@ -436,7 +436,7 @@ export class StagioniService {
           if (costruttore === undefined) {
             //Richiesta API wiki per ottenere l'immagine del costruttore
             const wikiData: any = await lastValueFrom(this.api.getDataWikipedia(this.api.estraiTitoliDaUrls([posizione.Constructor.url]), this.api.imageSize));
-            console.log(wikiData);
+            //console.log(wikiData);
             //Link dell'immagine del costruttore
             let immagine: string = this.api.getImageUrlCostruttore(wikiData.query.pages[wikiData.query.pageids[0]], posizione.Constructor);
             //this.api.getImageUrlFromPage(wikiData.query.pages[wikiData.query.pageids[0]], [posizione.Constructor.constructorId, "logo"]);

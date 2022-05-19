@@ -55,7 +55,7 @@ export class CostruttoreComponent implements OnInit, AfterViewChecked {
    * Imposta l'altezza della carta
    */
   setMaxAltezzaCard() {
-    console.log("A")
+    //console.log("A")
     //Altezza della tabella
     let hTab: number | undefined = document.getElementById('tab')?.clientHeight;
     if(!hTab)

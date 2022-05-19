@@ -34,12 +34,12 @@ export class CircuitiService {
     if (!this.cache.circBool) {
       //Richiesta API per ottenere tutti i circuiti di F1
       this.api.getDataF1Api('https://ergast.com/api/f1/circuits.json', offset).subscribe((circuiti: any) => {
-        console.log(circuiti);
+        //console.log(circuiti);
 
         //Richiesta API wiki per ottenere le immagini dei circuiti
         //const urls: string[] = this.api.estraiTitoliDaVettoreGenerico(circuiti.MRData.CircuitTable.Circuits);
         this.api.getDataWikipedia(["List_of_Formula_One_circuits"], this.api.imageSize).subscribe((wikiData: any) => {
-          console.log(wikiData);
+          //console.log(wikiData);
 
           //Inserimento dei circuiti nella cache
           circuiti.MRData.CircuitTable.Circuits.forEach((circuito: any) => {
@@ -64,7 +64,7 @@ export class CircuitiService {
       });
     }
 
-    console.warn(this.cache);
+    //console.warn(this.cache);
   }
 
   /**
@@ -79,11 +79,11 @@ export class CircuitiService {
 
     //Richiesta API per il circuito
     const circuito: any = await lastValueFrom(this.api.getDataF1Api(`https://ergast.com/api/f1/circuits/${id}.json`, 0));
-    console.log(circuito);
+    //console.log(circuito);
 
     //Richiesta API wiki per ottenere l'immagine del circuito
     const wikiData: any = await lastValueFrom(this.api.getDataWikipedia(["List_of_Formula_One_circuits"], this.api.imageSize));
-    console.log(wikiData);
+    //console.log(wikiData);
     //Link dell'immagine del circuito
     let immagine: string = this.api.getImageUrlCircuito(wikiData.query.pages[wikiData.query.pageids[0]], circuito.MRData.CircuitTable.Circuits[0]);
     //this.api.getImageUrlFromPage(wikiData.query.pages[wikiData.query.pageids[0]],
@@ -127,7 +127,7 @@ export class CircuitiService {
     if (!circuito.stagioniBool) {
       //Richiesta API per ottenere le gare fatte sul circuito
       this.api.getDataF1Api(`https://ergast.com/api/f1/circuits/${circuito.id}/results/1.json`, offset).subscribe((gareCircuito: any) => {
-        console.log(gareCircuito);
+        //console.log(gareCircuito);
 
         //Inserisco le gare nella cache
         gareCircuito.MRData.RaceTable.Races.forEach(async (garaData: any) => {

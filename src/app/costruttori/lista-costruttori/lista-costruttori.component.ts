@@ -15,7 +15,7 @@ export class ListaCostruttoriComponent implements OnInit {
 
   ngOnInit(): void {
     this.mappaCostruttori = this.costruttoriService.getTuttiCostruttori();
-    console.log(this.mappaCostruttori);
+    //console.log(this.mappaCostruttori);
   }
 
 }
