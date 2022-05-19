@@ -1,74 +1,13 @@
-<!-- <div class="mx-auto w-11/12 max-w-screen-2xl flex flex-col gap-8 xl:flex-row">
-
-    <div class="card card-side bg-base-100 shadow-xl max-h-96 w-full xl:w-3/8">
-        <figure class="w-1/2"><img class="bg-contain" [src]="selezione?.imgUrl" alt="pilota {{selezione?.nome}} {{selezione?.cognome}}"></figure>
-        <div class="card-body w-1/2">
-            <div class="mb-6 p-2">
-                <h1 class="text-2xl text-center font-bold">{{selezione?.nome + " " + selezione?.cognome}}</h1>
-                <p class="text-center font-semibold">{{selezione?.nazionalita}} ({{selezione?.dataDiNascita | date}})</p>
-                <div class="mt-2 flex flex-row justify-center items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="mr-1" viewBox="0 0 16 16">
-                    <path d="M2.5.5A.5.5 0 0 1 3 0h10a.5.5 0 0 1 .5.5c0 .538-.012 1.05-.034 1.536a3 3 0 1 1-1.133 5.89c-.79 1.865-1.878 2.777-2.833 3.011v2.173l1.425.356c.194.048.377.135.537.255L13.3 15.1a.5.5 0 0 1-.3.9H3a.5.5 0 0 1-.3-.9l1.838-1.379c.16-.12.343-.207.537-.255L6.5 13.11v-2.173c-.955-.234-2.043-1.146-2.833-3.012a3 3 0 1 1-1.132-5.89A33.076 33.076 0 0 1 2.5.5zm.099 2.54a2 2 0 0 0 .72 3.935c-.333-1.05-.588-2.346-.72-3.935zm10.083 3.935a2 2 0 0 0 .72-3.935c-.133 1.59-.388 2.885-.72 3.935z"/>
-                    </svg>
-                    {{selezione?.stagioniVinte}}
-                </div>
-            </div>
-            <div class="overflow-x-auto max-h-full xl:max-h-[300px]">
-                <table class="table table-compact w-full text-center">
-                    <thead>
-                        <tr>
-                            <th>Costruttori</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr routerLink="/costruttore/{{costruttore.id}}"
-                            class="cursor-pointer hover t"
-                            *ngFor="let costruttore of selezione?.costruttori">
-                            <td>{{costruttore.nome}}</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-      </div>
-
-      <div class="w-full xl:w-5/8 my-auto">
-      <div class="overflow-x-auto max-h-full">
-        <table class="table table-compact w-full text-center">
-            <thead>
-                <tr class="sticky top-0">
-                    <th>Stagione</th>
-                    <th>Posizione</th>
-                    <th>Vittorie</th>
-                    <th>Costruttore</th>
-                    <th>Punti</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr class="cursor-pointer hover t"
-                    *ngFor="let posizoneStagione of selezione?.stagioniERisultato | keyvalue">
-                    <td>{{posizoneStagione.value.stagione.anno}}</td>
-                    <td>{{posizoneStagione.value.posizione}}</td>
-                    <td>{{posizoneStagione.value.vittore}}</td>
-                    <td>{{posizoneStagione.value.costruttore.nome}}</td>
-                    <td>{{posizoneStagione.value.punti}}</td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-    </div>
-</div> -->
-
 <div class="mx-auto w-11/12 max-w-screen-2xl flex flex-col gap-8 xl:flex-row">
 
-    <div id="carta" class="card card-side bg-base-100 shadow-xl w-full xl:w-3/8 flex-col gap-3">
-        <div class="flex md:flex-row flex-col-reverse">
-            <figure class="md:w-1/2 w-full">
-                <img class="bg-contain md:rounded-br-lg" [src]="selezione?.imgUrl">
-            </figure>
+    <div id="carta" class="card card-side bg-base-100 shadow-xl w-full xl:w-3/8 flex-col gap-3 xl:max-h-[calc(100vh-100px)] xl:sticky top-8">
+        <div class="flex md:flex-row flex-col-reverse max-h-[60%]">
+            <div class="md:w-1/2 w-full">
+                <img class="bg-contain max-h-full md:rounded-br-lg" [src]="selezione?.imgUrl">
+            </div>
             <div class="md:w-1/2 w-full my-auto p-3">
                 <div class="mb-6 text-center">
-                    <h1 class="text-5xl font-bold">{{selezione?.nome + " " + selezione?.cognome}}</h1>
+                    <h1 class="text-3xl xs:text-4xl font-bold">{{selezione?.nome + " " + selezione?.cognome}}</h1>
                     <p class="text-center font-semibold">{{selezione?.nazionalita}} ({{selezione?.dataDiNascita | date}})</p>
                     <div class="text-lg mt-2 flex flex-row justify-center gap-4">
                         <div class="flex flex-row items-center">
@@ -89,7 +28,7 @@
         </div>
 
         <div class="flex flex-col p-2 overflow-auto">
-            <h2 class="text-center text-xl font-semibold mb-2">Piloti</h2>
+            <h2 class="text-center text-xl font-semibold mb-2">Costruttori</h2>
             <div class="overflow-auto max-h-[500px] xl:max-h-full">
                 <table class="table table-compact w-full text-center">
                     <thead class="sticky top-0">
@@ -101,7 +40,7 @@
                     <tbody>
                         <tr routerLink="/costruttore/{{costruttore.id}}" class="cursor-pointer hover"
                             *ngFor="let costruttore of selezione?.costruttori">
-                            <td>{{costruttore.nome}}</td>
+                            <td><button routerLink="/costruttore/{{costruttore.id}}" class="btn btn-xs btn-outline hover:btn-primary">{{costruttore.nome}}</button></td>
                             <td>{{costruttore.nazionalita}}</td>
                         </tr>
                     </tbody>
@@ -126,9 +65,9 @@
                 <tbody>
                     <tr class="cursor-pointer hover" routerLink="/stagione/{{posizoneStagione.value.stagione.anno}}"
                         *ngFor="let posizoneStagione of selezione?.stagioniERisultato| keyvalue: inversKey">
-                        <td>{{posizoneStagione.value.stagione.anno}}</td>
+                        <td><button routerLink="/stagione/{{posizoneStagione.value.stagione.anno}}" class="btn btn-xs btn-outline hover:btn-primary">{{posizoneStagione.value.stagione.anno}}</button></td>
                         <td>{{posizoneStagione.value.posizione}}</td>
-                        <td>{{posizoneStagione.value.costruttore.nome}}</td>
+                        <td><button routerLink="/costruttore/{{posizoneStagione.value.costruttore.id}}" class="btn btn-xs btn-outline hover:btn-primary">{{posizoneStagione.value.costruttore.nome}}</button></td>
                         <td>{{posizoneStagione.value.vittore}}</td>
                         <td>{{posizoneStagione.value.punti}}</td>
                     </tr>

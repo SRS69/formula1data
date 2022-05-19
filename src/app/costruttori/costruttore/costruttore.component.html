@@ -1,14 +1,13 @@
 <div class="mx-auto w-11/12 max-w-screen-2xl flex flex-col gap-8 xl:flex-row">
 
-    <div id="carta" class="card card-side bg-base-100 shadow-xl w-full xl:w-3/8 flex-col gap-3">
-        <div class="flex md:flex-row flex-col-reverse">
-            <figure class="md:w-1/2 w-full">
-                <img class="bg-contain md:rounded-br-lg" [src]="selezione?.imgUrl"
-                    alt="costruttore {{selezione?.nome}}">
-            </figure>
+    <div id="carta" class="card card-side bg-base-100 shadow-xl w-full xl:w-3/8 flex-col gap-3 xl:max-h-[calc(100vh-160px)] xl:sticky top-8">
+        <div class="flex md:flex-row flex-col-reverse max-h-[60%]">
+            <div class="md:w-1/2 w-full">
+                <img class="bg-cover max-h-full md:rounded-br-lg" [src]="selezione?.imgUrl">
+            </div>
             <div class="md:w-1/2 w-full my-auto p-3">
                 <div class="mb-6 text-center">
-                    <h1 class="text-5xl font-bold">{{selezione?.nome}}</h1>
+                    <h1 class="text-3xl xs:text-4xl font-bold">{{selezione?.nome}}</h1>
                     <p class="text-lg font-semibold">{{selezione?.nazionalita}}</p>
                     <div class="text-lg mt-2 flex flex-row justify-center gap-4">
                         <div class="flex flex-row items-center">

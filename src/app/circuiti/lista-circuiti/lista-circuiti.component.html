@@ -1,10 +1,10 @@
-<div *ngIf="mappaCiruciti" class="mx-auto w-11/12">
+<div *ngIf="mappaCiruciti" class="mx-auto w-11/12 max-w-screen-2xl">
     <div>
-        <h1 class="text-2xl text-center font-bold">Circuiti di Formula 1</h1>
+        <h1 class="text-4xl font-bold text-center">Circuiti di Formula 1</h1>
     </div>
-    <div class="overflow-x-auto mt-10">
+    <div *ngIf="mappaCiruciti && cache.circBool; else loading" class="overflow-auto sm:overflow-clip mt-10">
         <table class="table table-compact w-full text-center">
-          <thead>
+          <thead class="sticky top-0">
             <tr>
               <th>Nome</th>
               <th>Paese</th> 
@@ -20,4 +20,10 @@
           </tbody> 
         </table>
       </div>
+
+      <ng-template #loading>
+        <div class="flex my-auto mt-10 self-center justify-center min-h-full">
+          <progress class="radial-progress animate-spin" style="--value:30;">Caricamento</progress>
+        </div>
+      </ng-template>
 </div>

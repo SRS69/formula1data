@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Costruttore } from 'src/app/classi/costruttore';
-import { MapNO } from 'src/app/servizi/cache.service';
+import { CacheService, MapNO } from 'src/app/servizi/cache.service';
 import { CostruttoriService } from 'src/app/servizi/costruttori.service';
 
 @Component({
@@ -11,7 +11,7 @@ import { CostruttoriService } from 'src/app/servizi/costruttori.service';
 export class ListaCostruttoriComponent implements OnInit {
 
   mappaCostruttori: MapNO<string, Costruttore> | undefined;
-  constructor(private costruttoriService: CostruttoriService) { }
+  constructor(private costruttoriService: CostruttoriService, public cache: CacheService) { }
 
   ngOnInit(): void {
     this.mappaCostruttori = this.costruttoriService.getTuttiCostruttori();

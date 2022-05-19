@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Pilota } from 'src/app/classi/pilota';
-import { MapNO } from 'src/app/servizi/cache.service';
+import { CacheService, MapNO } from 'src/app/servizi/cache.service';
 import { PilotiService } from 'src/app/servizi/piloti.service';
 
 @Component({
@@ -11,8 +11,7 @@ import { PilotiService } from 'src/app/servizi/piloti.service';
 export class ListaPilotiComponent implements OnInit {
 
   mappaPiloti: MapNO<string, Pilota> | undefined;
-  constructor(private pilotiService: PilotiService) {
-  }
+  constructor(private pilotiService: PilotiService, public cache: CacheService) {}
 
   ngOnInit(): void {
     this.mappaPiloti = this.pilotiService.getTuttiPiloti();

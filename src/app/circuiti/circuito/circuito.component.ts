@@ -1,6 +1,8 @@
+import { KeyValue } from '@angular/common';
 import { Component, Input, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Circuito } from 'src/app/classi/circuito';
+import { Gara } from 'src/app/classi/gara';
 import { CircuitiService } from 'src/app/servizi/circuiti.service';
 
 @Component({
@@ -12,7 +14,7 @@ export class CircuitoComponent implements OnInit {
 
   id: string | undefined;
 
-  circuitoSelezionato: Circuito | undefined;
+  selezione: Circuito | undefined;
   constructor(private circuitiService: CircuitiService, private route: ActivatedRoute) { }
 
   ngOnInit(): void {
@@ -25,9 +27,11 @@ export class CircuitoComponent implements OnInit {
   }
 
   async selezionaCircuito(id: string) {
-    this.circuitoSelezionato = await this.circuitiService.completaCircuito(id);
+    this.selezione = await this.circuitiService.completaCircuito(id);
   }
 
-
+  inversKey = (a: KeyValue<number, Gara>, b: KeyValue<number, Gara>): number => {
+    return a.key > b.key ? -1 : (b.key > a.key ? 1 : 0);
+  }
 
 }

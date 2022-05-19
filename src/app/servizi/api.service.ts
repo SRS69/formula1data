@@ -126,13 +126,21 @@ export class ApiService {
     return -1;
   }
 
-  
-  getImageUrlFromPage(page: any, forceThumbnail:boolean, searchInImages?: string[]): string {
+
+  getImageUrlFromPage(page: any, forceThumbnail: boolean, searchInImages?: string[], bannedImages?: string[]): string {
+
+    //mette i parametri di ricerca in lowercase e elimina i duplicati
+    if (searchInImages) {
+      searchInImages = searchInImages.map(elem => elem.toLowerCase());
+      searchInImages = searchInImages.filter((value, index, self) => self.indexOf(value) === index);
+    }
     //Controlla se c'è l'immagine "ufficiale" della pagina
     if (page?.thumbnail?.source) {
       if (searchInImages && !forceThumbnail) {
         for (let i = 0; i < searchInImages.length; i++) {
           const titoloThumbnail: string = page.thumbnail.source;
+          if(bannedImages && bannedImages.includes(titoloThumbnail))
+            continue;
           if ((titoloThumbnail.toLowerCase()).includes(searchInImages[i].toLowerCase())) {
             return page.thumbnail.source;
           }
@@ -144,7 +152,7 @@ export class ApiService {
 
     //Cicla tra le imamgini della pagina e usa il filtro di ricerca
     if (page?.images && searchInImages) {
-      const indiceRisultato: number = this.risultatoPiuProbabile(page, searchInImages);
+      const indiceRisultato: number = this.risultatoPiuProbabile(page, searchInImages, bannedImages);
       if (indiceRisultato !== -1) {
         return "https://en.wikipedia.org/wiki/Special:Redirect?wptype=file&wpvalue=" + page.images[indiceRisultato].title + "&width=" + this.imageSize;
       }
@@ -159,9 +167,9 @@ export class ApiService {
    * @param filtri Parole da ricercare nell'immagine
    * @returns Indice dell'immagine più probabile
    */
-  private risultatoPiuProbabile(page: any, filtri: string[]): number {
+  private risultatoPiuProbabile(page: any, filtri: string[], bannedImages?: string[]): number {
     //Iterate over the images of the page and, for each image, return the number of times a string from the searchInImages array is found in the image title
-    if(!page.images)
+    if (!page.images)
       return -1;
 
     let maxOc = 0; //Numero massime di occorrenze
@@ -169,34 +177,43 @@ export class ApiService {
     //Cicla tra le imamgini della pagina
     for (let i = 0; i < page.images.length; i++) {
       const titolo: string = page.images[i].title;
-      if (titolo != "File:Commons-logo.svg") {
-        let oc = 0; //numero di occorrenze
-        //Ciclo per contare le occorrenze con i filtri
-        for (let j = 0; j < filtri.length; j++) {
-          if (titolo.toLowerCase().includes(filtri[j].toLowerCase())) {
-            oc++;
-          }
-        }
-        //Controllo se bisogna cambiare i massimi
-        if (oc > maxOc) {
-          maxOc = oc;
-          maxIndex = i;
+
+      if(titolo == "File:Austin circuit.svg" || titolo == "File:Zandvoort Circuit.png")
+        console.log(titolo);
+        //Controlla se l'imamgine appartiene tra quelle bannate
+      if (bannedImages && bannedImages.includes(titolo))
+        continue;
+
+      let oc = 0; //numero di occorrenze
+      //Ciclo per contare le occorrenze con i filtri
+      for (let j = 0; j < filtri.length; j++) {
+        if (titolo.toLowerCase().includes(filtri[j].toLowerCase())) {
+          oc += (filtri.length-j)*filtri.length;
         }
       }
+      //Controllo se bisogna cambiare i massimi
+      if (oc > maxOc) {
+        maxOc = oc;
+        maxIndex = i;
+      }
+    
     }
     return maxIndex;
   }
 
   getImageUrlCircuito(page: any, circuito: { circuitId: string; circuitName: string; Location: { locality: string; country: string; }; }): string {
-    let searchInImages: string[] = ((circuito.circuitId).replace("_", "&")+"&"+(circuito.circuitName+"&"+circuito.Location.locality+"&"+circuito.Location.country).replace(" ", "&")).split("&");
-    return this.getImageUrlFromPage(page, false, searchInImages);
+    if (circuito.circuitId === "red_bull_ring")
+      console.log("A")
+
+    let searchInImages: string[] = (circuito.Location.locality + "&" + (circuito.circuitId).replace(/_/g, "&") + "&" + (circuito.circuitName + "&" + "&" + circuito.Location.country).replace(/ /g, "&")).split("&");
+    return this.getImageUrlFromPage(page, false, searchInImages, ["File:Cscr-featured.svg", "File:Commons-logo.svg", `https://upload.wikimedia.org/wikipedia/commons/thumb/a/aa/Formula_1_all_over_the_world-2022.svg/${this.imageSize}px-Formula_1_all_over_the_world-2022.svg.png`]);
   }
 
   getImageUrlCostruttore(page: any, costruttore: { constructorId: string; }): string {
-    return this.getImageUrlFromPage(page, true, [costruttore.constructorId, "logo"]);
+    return this.getImageUrlFromPage(page, true, [costruttore.constructorId, "logo"], ["File:Commons-logo.svg"]);
   }
 
   getImageUrlPilota(page: any, pilota: { familyName: string; }): string {
-    return this.getImageUrlFromPage(page, true, [pilota.familyName]);
+    return this.getImageUrlFromPage(page, true, [pilota.familyName], ["File:Commons-logo.svg"]);
   }
 }

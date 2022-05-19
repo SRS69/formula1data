@@ -16,7 +16,7 @@ export class CostruttoreComponent implements OnInit, AfterViewChecked {
   resizeObservable$: any;
   constructor(private costruttoriService: CostruttoriService, private activatedRoute: ActivatedRoute, private router: Router) { }
   ngAfterViewChecked(): void {
-    this.setMaxAltezzaCard();
+    //this.setMaxAltezzaCard();
   }
 
   ngOnInit(): void {
@@ -72,6 +72,10 @@ export class CostruttoreComponent implements OnInit, AfterViewChecked {
       return;
     }
 
+    let t = document.getElementById('t')
+    if(!t)
+      return;
+
     if(window.innerWidth < 1280) {
       carta.style.maxHeight = "fit-content";
       return;
@@ -83,7 +87,7 @@ export class CostruttoreComponent implements OnInit, AfterViewChecked {
       return;
     }
 
-    //Tabella più piccolo dello schermo
+    //Tabella più piccola dello schermo
     carta.style.maxHeight = (window.innerHeight - 200) + "px";
   }
 }
