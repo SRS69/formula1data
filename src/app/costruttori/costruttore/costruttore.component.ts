@@ -1,5 +1,5 @@
 import { KeyValue } from '@angular/common';
-import { AfterContentChecked, AfterContentInit, AfterViewChecked, AfterViewInit, Component, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Costruttore } from 'src/app/classi/costruttore';
 import { PostoClassificaCostruttori } from 'src/app/classi/stagione';
@@ -10,14 +10,11 @@ import { CostruttoriService } from 'src/app/servizi/costruttori.service';
   templateUrl: './costruttore.component.html',
   styleUrls: ['./costruttore.component.css']
 })
-export class CostruttoreComponent implements OnInit, AfterViewChecked {
+export class CostruttoreComponent implements OnInit {
 
   selezione: Costruttore | undefined;
   resizeObservable$: any;
   constructor(private costruttoriService: CostruttoriService, private activatedRoute: ActivatedRoute, private router: Router) { }
-  ngAfterViewChecked(): void {
-    //this.setMaxAltezzaCard();
-  }
 
   ngOnInit(): void {
     //Controlla se è cambiato l'id dell'url

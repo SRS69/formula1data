@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 
 import { FirebaseService } from '../servizi/firebase.service';
-import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { Router } from '@angular/router';
 
 

@@ -1,5 +1,5 @@
 import { KeyValue } from '@angular/common';
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Circuito } from 'src/app/classi/circuito';
 import { Gara } from 'src/app/classi/gara';

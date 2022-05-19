@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, SimpleChange } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Stagione } from '../classi/stagione';
 import { StagioniService } from '../servizi/stagioni.service';
 import {ActivatedRoute, Router} from '@angular/router';

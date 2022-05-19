@@ -1,6 +1,6 @@
 import { MapNO } from "../servizi/cache.service";
 import { Pilota } from "./pilota";
-import { PostoClassificaCostruttori, Stagione } from "./stagione";
+import { PostoClassificaCostruttori } from "./stagione";
 
 export class Costruttore {
     id: string;

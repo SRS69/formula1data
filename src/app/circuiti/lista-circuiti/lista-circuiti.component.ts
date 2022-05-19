@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { from } from 'rxjs';
 import { Circuito } from 'src/app/classi/circuito';
 import { CacheService, MapNO } from 'src/app/servizi/cache.service';
 import { CircuitiService } from 'src/app/servizi/circuiti.service';

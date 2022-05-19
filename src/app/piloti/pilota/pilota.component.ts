@@ -1,5 +1,5 @@
 import { KeyValue } from '@angular/common';
-import { AfterViewChecked, Component, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Pilota } from 'src/app/classi/pilota';
 import { PostoClassificaPiloti } from 'src/app/classi/stagione';
@@ -10,13 +10,10 @@ import { PilotiService } from 'src/app/servizi/piloti.service';
   templateUrl: './pilota.component.html',
   styleUrls: ['./pilota.component.css']
 })
-export class PilotaComponent implements OnInit, AfterViewChecked {
+export class PilotaComponent implements OnInit {
 
   selezione: Pilota | undefined;
   constructor(private pilotiService: PilotiService, private activatedRoute: ActivatedRoute, private router: Router) {
-  }
-  ngAfterViewChecked(): void {
-    //this.setMaxAltezzaCard();
   }
 
   ngOnInit(): void {
