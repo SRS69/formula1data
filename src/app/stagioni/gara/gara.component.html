@@ -1,14 +1,14 @@
 <div *ngIf="selezione?.classificaGaraBool; else loading" 
 class="mx-auto max-w-screen-2xl w-11/12 flex flex-col gap-16">
-  <div class="text-center">
-    <h1 routerLink="/stagione/{{selezione?.stagione?.anno}}" class="text-4xl font-bold cursor-pointer">Stagione {{selezione?.stagione?.anno}} - Round {{selezione?.round}}</h1>
+  <div routerLink="/stagione/{{selezione?.stagione?.anno}}" class="text-center hover:scale-105 cursor-pointer">
+    <h1 class="text-4xl font-bold">Stagione {{selezione?.stagione?.anno}} - Round {{selezione?.round}}</h1>
     <h2 class="text-2xl font-semibold">{{selezione?.nome}}</h2>
   </div>
 
   <div class="grid grid-cols-1 xl:grid-cols-2 xl:gap-8 gap-3">
     <div class="my-auto">
-      <h2 class="text-center text-3xl font-semibold mb-2">Circuito</h2>
-    <div class="card card-side bg-base-100 shadow-xl w-full flex-col gap-3 h-min cursor-pointer">
+      <h2 class="text-center text-3xl font-semibold mb-4">Circuito</h2>
+    <div class="hover:scale-105 card card-side bg-base-100 shadow-xl w-full flex-col gap-3 h-min cursor-pointer">
       <div routerLink="/circuito/{{selezione?.circuito?.id}}" class="flex md:flex-row flex-col-reverse" *ngIf="selezione?.circuito !== undefined">
         <figure class="md:w-1/2 w-full">
           <img class="bg-contain" [src]="selezione?.circuito?.imgUrl">
@@ -24,8 +24,8 @@ class="mx-auto max-w-screen-2xl w-11/12 flex flex-col gap-16">
   </div>
   <div class="divider xl:hidden"></div> 
   <div class="my-auto">
-    <h2 class="text-center text-3xl font-semibold mb-2">Vincitore</h2>
-    <div class="card card-side bg-base-100 shadow-xl flex-col gap-3 cursor-pointer">
+    <h2 class="text-center text-3xl font-semibold mb-4">Vincitore</h2>
+    <div class="hover:scale-105 card card-side bg-base-100 shadow-xl flex-col gap-3 cursor-pointer">
       <div routerLink="/pilota/{{selezione?.classificaGara?.get(1)?.pilota?.id}}" class="flex md:flex-row flex-col-reverse" *ngIf="selezione?.classificaGara?.get(1) !== undefined">
         <figure class="md:w-1/2 w-full">
           <img class="bg-contain" [src]="selezione?.classificaGara?.get(1)?.pilota?.imgUrl">

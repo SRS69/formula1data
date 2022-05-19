@@ -1,1 +1,33 @@
-<p>home works!</p>
+<div class="absolute hero h-screen top-0 flex items-center justify-center z-0">
+    <video autoplay="" muted="" loop="" class="absolute h-full w-full z-5 top-0 left-0 object-cover">
+        <source src="/assets/video/F1Montage.mp4" type="video/mp4">
+    </video>
+    
+        <div
+            class="hero-content text-center text-base-content backdrop-blur bg-opacity-30 bg-base-100 sm:rounded-3xl z-20">
+            <div class="w-full sm:max-w-md">
+                <h1 class="text-5xl font-bold">Tutti i risultati del tuo sport preferito</h1>
+
+                <div class="divider"></div> 
+   
+                <div class="flex flex-col text-center">
+                    <h1 class="text-3xl font-bold mb-5">Sezioni</h1>
+                    <div class="flex flex-wrap justify-center gap-2">
+                        <div>
+                            <button routerLink="/stagione" class="btn btn-primary">Stagioni</button>
+                        </div>
+                        <div>
+                            <button routerLink="/circuito" class="btn btn-primary">Circuiti</button>
+                        </div>
+                        <div>
+                            <button routerLink="/pilota" class="btn btn-primary">Piloti</button>
+                        </div>
+                        <div>
+                            <button routerLink="/costruttore" class="btn btn-primary">Costruttori</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+</div>
+

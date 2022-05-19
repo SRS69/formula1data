@@ -47,7 +47,7 @@ export class ApiService {
    */
   getDataWikipedia(titoliPagine: Array<string>, dimensioni: number) {
     //https://en.wikipedia.org/w/index.php?title=Special:Redirect/file/
-    return this.http.get(`https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&indexpageids=1&redirects=1&imlimit=500&prop=pageimages%7Cimages&piprop=thumbnail&pithumbsize=${dimensioni}&pilicense=any&titles=${(titoliPagine.join('|'))}`);
+    return this.http.get(`https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&indexpageids=1&redirects=1&imlimit=500&prop=pageimages|images&piprop=thumbnail&pithumbsize=${dimensioni}&pilicense=any&titles=${(titoliPagine.join('|'))}`);
   }
 
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -178,9 +178,7 @@ export class ApiService {
     for (let i = 0; i < page.images.length; i++) {
       const titolo: string = page.images[i].title;
 
-      if(titolo == "File:Austin circuit.svg" || titolo == "File:Zandvoort Circuit.png")
-        console.log(titolo);
-        //Controlla se l'imamgine appartiene tra quelle bannate
+      //Controlla se l'imamgine appartiene tra quelle bannate
       if (bannedImages && bannedImages.includes(titolo))
         continue;
 
@@ -202,9 +200,6 @@ export class ApiService {
   }
 
   getImageUrlCircuito(page: any, circuito: { circuitId: string; circuitName: string; Location: { locality: string; country: string; }; }): string {
-    if (circuito.circuitId === "red_bull_ring")
-      console.log("A")
-
     let searchInImages: string[] = (circuito.Location.locality + "&" + (circuito.circuitId).replace(/_/g, "&") + "&" + (circuito.circuitName + "&" + "&" + circuito.Location.country).replace(/ /g, "&")).split("&");
     return this.getImageUrlFromPage(page, false, searchInImages, ["File:Cscr-featured.svg", "File:Commons-logo.svg", `https://upload.wikimedia.org/wikipedia/commons/thumb/a/aa/Formula_1_all_over_the_world-2022.svg/${this.imageSize}px-Formula_1_all_over_the_world-2022.svg.png`]);
   }

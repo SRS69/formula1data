@@ -7,12 +7,12 @@
       <h1>Stagione</h1>
     </div>
     <div class="btn-group w-max">
-      <button class="btn btn-secondary rounded-r-none" [ngClass]="{'btn-disabled': ((selezione?.anno!-1) < 1950)}"
+      <button class="btn btn-primary rounded-r-none" [ngClass]="{'btn-disabled': ((selezione?.anno!-1) < 1950)}"
         routerLink="/stagione/{{selezione?.anno!-1}}">«</button>
-      <input #annoInput class="btn btn-secondary no-animation text-2xl text-center font-bold out-of-range:border-red-500 rounded-none"
+      <input #annoInput class="btn btn-primary no-animation text-2xl text-center font-bold out-of-range:border-red-500 rounded-none"
         type="number" min="1950" max="{{getAnnoMaggiore()}}" step="1" value="{{selezione?.anno}}"
         routerLink="/stagione/{{annoInput.value}}" />
-      <button class="btn btn-secondary rounded-l-none" [ngClass]="{'btn-disabled': (getAnnoMaggiore() < (selezione?.anno!+1))}"
+      <button class="btn btn-primary rounded-l-none" [ngClass]="{'btn-disabled': (getAnnoMaggiore() < (selezione?.anno!+1))}"
         routerLink="/stagione/{{selezione?.anno!+1}}">»</button>
     </div>
   </div>

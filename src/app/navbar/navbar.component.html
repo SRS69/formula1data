@@ -1,4 +1,5 @@
-<div class="max-w-screen-3xl bg-base-100 text-base-content flex-col mx-auto">
+<div class="bg-base-100 text-base-content flex-col -z-10" [ngClass]="{'backdrop-blur bg-opacity-30': this.router.url == '/'}">
+    <div class="max-w-screen-3xl mx-auto">
     <div class="navbar">
         <div class="navbar-start">
             <div class="dropdown">
@@ -72,4 +73,5 @@
             </div>
         </div>
     </div>
+</div>
 </div>

@@ -12,8 +12,6 @@ export class Gara {
     stagione: Stagione;
 
     classificaGaraBool: boolean;
-    classificaQualificaBool: boolean;
-    classificaGiriBool: boolean;
     classificaGara: MapNO<number, PostoGara>;
 
     constructor(nome: string, round: number, data: Date, circuito: Circuito, stagione: Stagione) {
@@ -24,8 +22,6 @@ export class Gara {
         this.stagione = stagione;
 
         this.classificaGaraBool = false;
-        this.classificaQualificaBool = false;
-        this.classificaGiriBool = false;
 
         this.classificaGara = new MapNO<number, PostoGara>();
     }

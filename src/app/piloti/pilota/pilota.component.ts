@@ -16,7 +16,7 @@ export class PilotaComponent implements OnInit, AfterViewChecked {
   constructor(private pilotiService: PilotiService, private activatedRoute: ActivatedRoute, private router: Router) {
   }
   ngAfterViewChecked(): void {
-    this.setMaxAltezzaCard();
+    //this.setMaxAltezzaCard();
   }
 
   ngOnInit(): void {
