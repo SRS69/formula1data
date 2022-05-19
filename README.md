@@ -1,5 +1,22 @@
 # Formula1Data
 
+## Requisiti
+- Angular (v. 13.3.2)
+- Node (16 lts)
+
+## Come avviarlo
+
+- ### Github
+    Si consiglia l'utilizzo di Docker. Dopo aver scaricato questa repository basta avviare un terminale nella cartella in cui si trova il `Dockerfile` e eseguire il comando `docker build . -t [nome-immagine]`. Dopo aver creato l'immagina bisognerà eseguire il comando `docker run -d -it --name [nome-container] [nome-immagine]`.
+    
+- ### DockerHub
+    Se si ha accesso alla repository [DockerHub](https://hub.docker.com/repository/docker/srs69/formula1data) basterà scaricare l'ultima immagine caricata con il comando `docker pull srs69/formula1data:latest`, e dopo avviare il container con il comando `docker run -d -it --name [nome-container] srs69/formula1data:latest`.
+
+Dopo aver creato e messo in esecuzione il container basterà aprire la console del container, se non lo si è già spostartsi in `/formula1data`, e eseguire il comando `ng serve`.
+
+
+# Parte autogenerata da Angular
+
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 13.3.2.
 
 ## Development server

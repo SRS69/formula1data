@@ -16,6 +16,8 @@ export class CacheService {
     this.piloti = new MapNO<string, Pilota>();
     this.costruttori = new MapNO<string, Costruttore>();
     this.circuiti = new MapNO<string, Circuito>();
+
+    console.warn(this);
   }
 
   //Booleani per controllare se sono stati caricati tutti i dati base
