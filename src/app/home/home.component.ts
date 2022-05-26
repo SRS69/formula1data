@@ -10,6 +10,8 @@ export class HomeComponent implements OnInit {
   constructor() { }
 
   ngOnInit(): void {
+    const vid: any = document.getElementById('vid')
+    setInterval(() => {vid.play()}, 2500)
   }
 
 }
