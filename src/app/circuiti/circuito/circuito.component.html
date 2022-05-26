@@ -39,7 +39,10 @@
                         <td><button routerLink="/stagione/{{gara.value.stagione.anno}}" class="btn btn-xs btn-outline hover:btn-primary">{{gara.value.stagione.anno}}</button></td>
                         <td>{{gara.value.round}}</td>
                         <td><button routerLink="/stagione/{{gara.value.stagione.anno}}/{{gara.value.round}}" class="btn btn-xs btn-outline hover:btn-primary">{{gara.value.nome}}</button></td>
-                        <td>{{gara.value.data | date}}</td>
+                        <td *ngIf="gara.value.data.toString() != 'Invalid Date'; else dataVuota">{{gara.value.data | date}}</td>
+                        <ng-template #dataVuota>
+                            <td></td>
+                        </ng-template>
                     </tr>
                 </tbody>
             </table>
